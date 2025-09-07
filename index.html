@@ -5,21 +5,26 @@
   <title>방글이를 지켜라</title>
   <style>
     body {
-  display: block;
-  margin: 0 auto;
-  padding: 0;
-  overflow: hidden;
-}
-canvas {
-  display: block;
-}
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+
+      display: flex;
+      justify-content: center;  
+      height: 100vh;           
+    }
+
+    canvas {
+      display: block;
+    }
   </style>
 </head>
 <body>
-  <canvas id="gameCanvas" width="850" height="1300"></canvas>
+  <canvas id="gameCanvas" width="900" height="1400"></canvas>
 
   <!-- JS 연결 -->
   <script src="bang_game.js"></script>
 </body>
 </html>
+
 
