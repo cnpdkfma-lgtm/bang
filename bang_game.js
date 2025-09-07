@@ -127,7 +127,7 @@ function createPatient(offset = 0) {
   const x = WIDTH / 2 - 27.5; 
   const y = -offset; 
 
-  return { x, y, width: 150, height: 220, disease, image };
+  return { x, y, width: 160, height: 230, disease, image };
 }
 
 function resetGame() {
@@ -298,3 +298,4 @@ function gameLoop() {
 
   requestAnimationFrame(gameLoop);
 }
+
