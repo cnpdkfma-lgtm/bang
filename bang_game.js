@@ -9,6 +9,8 @@ const ctx = canvas.getContext("2d");
 const WIDTH = canvas.width;
 const HEIGHT = canvas.height;
 
+let topRankings = [];
+
 const imageSources = {
   bang_default: "img/bang.png",
   bang_dental: "img/bang_dental.png",
@@ -77,6 +79,30 @@ function drawTextWithBackground(text, x, y, font = "10px Arial", textColor = "wh
   ctx.fillStyle = textColor;
   ctx.fillText(text, x, y);
 }
+
+//랭킹저장함수
+function saveScoreToFirebase(playerName, score) {
+  db.collection("rankings").add({
+    name: playerName,
+    score: score,
+    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+  });
+}
+//랭킹불러오기함수
+function loadTopRankings(callback) {
+  db.collection("rankings")
+    .orderBy("score", "desc")
+    .limit(5)
+    .get()
+    .then(snapshot => {
+      const rankings = [];
+      snapshot.forEach(doc => {
+        rankings.push(doc.data());
+      });
+      callback(rankings);
+    });
+}
+
 
 function setProtectionByClick(mx, my) {
   if (mx >= WIDTH / 2 - 250 && mx <= WIDTH / 2 - 250 + 159 && my >= HEIGHT - 240 && my <= HEIGHT - 240 + 234) {
@@ -175,6 +201,7 @@ canvas.addEventListener("click", (e) => {
 
 function gameLoop() {
   ctx.clearRect(0, 0, WIDTH, HEIGHT);
+
   if (gameStarted && !gameOver) {
     ctx.drawImage(images.background, 0, 0, WIDTH, HEIGHT);
   } else {
@@ -182,6 +209,7 @@ function gameLoop() {
     ctx.fillRect(0, 0, WIDTH, HEIGHT);
   }
 
+  // 게임 시작 전 화면
   if (!gameStarted) {
     ctx.drawImage(images.bang_default, WIDTH / 2 - 110, HEIGHT / 2 - 250, 200, 180);
     drawText("방글이에게 전파주의별", WIDTH / 2 - 200, HEIGHT / 2 - 10, 40, "black");
@@ -191,6 +219,7 @@ function gameLoop() {
     return;
   }
 
+  // 게임 오버 화면
   if (gameOver) {
     ctx.drawImage(images.bang_over, WIDTH / 2 - 110, HEIGHT / 2 - 250, 200, 180);
     drawText("감염되었습니다! 게임 종료", WIDTH / 2 - 220, HEIGHT / 2 - 45, 40, "black");
@@ -199,30 +228,35 @@ function gameLoop() {
     if (!nameEntered) {
       const playerName = prompt("이름을 입력하세요:");
       if (playerName) {
-        const rankings = JSON.parse(localStorage.getItem("rankings") || "[]");
-        rankings.push({ name: playerName, score });
-        rankings.sort((a, b) => b.score - a.score);
-        localStorage.setItem("rankings", JSON.stringify(rankings.slice(0, 5)));
+        saveScoreToFirebase(playerName, score);
       }
       nameEntered = true;
+
+      loadTopRankings((savedRankings) => {
+        drawTextWithBackground("방글이 지킴이 당신의 점수 top 5", 210, 30, "30px NanumGothic", "white", "blue");
+        savedRankings.forEach((entry, index) => {
+          drawText(`${index + 1}. ${entry.name} - ${entry.score}`, 320, 80 + index * 30, 30, "black");
+        });
+
+        drawButton("다시 시작", WIDTH / 2 - 200, HEIGHT / 2 + 60, 400, 100);
+      });
+
+      return;
     }
 
-    const savedRankings = JSON.parse(localStorage.getItem("rankings") || "[]");
-    drawTextWithBackground("방글이 지킴이 당신의 점수 top 5", 210, 30, "30px NanumGothic", "white", "blue");
-    savedRankings.slice(0, 5).forEach((entry, index) => {
-      drawText(`${index + 1}. ${entry.name} - ${entry.score}`, 320, 80 + index * 30, 30, "black");
-    });
-
+    // 이름 입력 후에는 바로 버튼만 보여줌
     drawButton("다시 시작", WIDTH / 2 - 200, HEIGHT / 2 + 60, 400, 100);
     return;
   }
 
+  // 환자 생성
   const maxPatients = stage < 3 ? 1 : 2;
   while (patients.length < maxPatients) {
-    const offset = patients.length === 0 ? 0 : 300;
+    const offset = patients.length === 0 ? 0 : 400;
     patients.push(createPatient(offset));
   }
 
+  // 환자 이동 및 충돌 처리
   for (let i = patients.length - 1; i >= 0; i--) {
     const pt = patients[i];
     pt.y += speed;
@@ -243,21 +277,24 @@ function gameLoop() {
     }
   }
 
+  // 스테이지 증가
   if (passedPatients >= 5 && stage < 50) {
     stage += 1;
     passedPatients = 0;
     speed += 0.5;
   }
 
+  // 방글이 이미지 및 점수 표시
   ctx.drawImage(bangImg, bang.x, bang.y, bang.width, bang.height);
   drawTextWithBackground(`스테이지: ${stage}`, 10, 10, "35px NanumGothic", "white", "black");
   drawTextWithBackground(`점수: ${score}`, 10, 65, "35px NanumGothic", "yellow", "black");
-  
-drawButtonImage(images.icon_dental, WIDTH / 2 - 250, HEIGHT - 240, 159, 234);
-drawButtonImage(images.icon_n95, WIDTH / 2 - 80, HEIGHT - 240, 166, 234);
-drawButtonImage(images.icon_gown, WIDTH / 2 + 90, HEIGHT - 240, 164, 234);
+
+  // 보호구 버튼 (게임 중일 때만)
+  if (gameStarted && !gameOver) {
+    drawButtonImage(images.icon_dental, WIDTH / 2 - 250, HEIGHT - 240, 159, 234);
+    drawButtonImage(images.icon_n95, WIDTH / 2 - 80, HEIGHT - 240, 166, 234);
+    drawButtonImage(images.icon_gown, WIDTH / 2 + 90, HEIGHT - 240, 164, 234);
+  }
 
   requestAnimationFrame(gameLoop);
 }
-
-
