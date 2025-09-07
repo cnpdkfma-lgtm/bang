@@ -17,6 +17,8 @@ const imageSources = {
   bang_over: "img/bang_over.png",
   pt1: "img/pt1.png",
   pt2: "img/pt2.png",
+  pt3: "img/pt3.png",
+  pt4: "img/pt4.png",
   background: "img/bg.PNG",
   icon_dental: "img/mask.png",
   icon_n95: "img/n95.png",
@@ -40,7 +42,7 @@ for (const key in imageSources) {
 }
 
 let bangImg;
-let bang = { x: WIDTH / 2 - 45, y: HEIGHT - 200, width: 95, height: 85 };
+let bang = { x: WIDTH / 2 - 100, y: HEIGHT - 415, width: 200, height: 170 };
 let patients = [];
 let score = 0;
 let stage = 1;
@@ -57,14 +59,33 @@ const protectionMap = {
   "가운+장갑": ["CRE", "Candida auris", "MRSA"]
 };
 
+function drawTextWithBackground(text, x, y, font = "10px Arial", textColor = "white", bgColor = "black") {
+  ctx.font = font;
+  ctx.textBaseline = "top"; // 글자 기준선
+  const padding = 5;
+
+  // 글자 크기 측정
+  const textMetrics = ctx.measureText(text);
+  const textWidth = textMetrics.width;
+  const textHeight = parseInt(font, 10); // 대략 글씨 크기
+
+  // 배경 박스 그리기
+  ctx.fillStyle = bgColor;
+  ctx.fillRect(x - padding, y - padding, textWidth + padding * 2, textHeight + padding * 2);
+
+  // 글자 그리기
+  ctx.fillStyle = textColor;
+  ctx.fillText(text, x, y);
+}
+
 function setProtectionByClick(mx, my) {
-  if (mx >= WIDTH - 180 && mx <= WIDTH - 120 && my >= HEIGHT - 80 && my <= HEIGHT - 10) {
+  if (mx >= WIDTH / 2 - 250 && mx <= WIDTH / 2 - 250 + 159 && my >= HEIGHT - 240 && my <= HEIGHT - 240 + 234) {
     currentProtection = "덴탈마스크";
     bangImg = images.bang_dental;
-  } else if (mx >= WIDTH - 120 && mx <= WIDTH - 60 && my >= HEIGHT - 80 && my <= HEIGHT - 10) {
+  } else if (mx >= WIDTH / 2 - 80 && mx <= WIDTH / 2 - 80 + 166 && my >= HEIGHT - 240 && my <= HEIGHT - 240 + 234) {
     currentProtection = "N95";
     bangImg = images.bang_n95;
-  } else if (mx >= WIDTH - 60 && mx <= WIDTH && my >= HEIGHT - 80 && my <= HEIGHT - 10) {
+  } else if (mx >= WIDTH / 2 + 90 && mx <= WIDTH / 2 + 90 + 164 && my >= HEIGHT - 240 && my <= HEIGHT - 240 + 234) {
     currentProtection = "가운+장갑";
     bangImg = images.bang_gown;
   }
@@ -73,10 +94,14 @@ function setProtectionByClick(mx, my) {
 function createPatient(offset = 0) {
   const diseases = ["백일해", "인플루엔자", "결핵", "수두", "CRE", "Candida auris", "MRSA"];
   const disease = diseases[Math.floor(Math.random() * diseases.length)];
-  const image = Math.random() < 0.5 ? images.pt1 : images.pt2;
-  const x = WIDTH / 2 - 27.5; // 중앙 정렬
-  const y = -offset; // 화면 위에서 시작
-  return { x, y, width: 55, height: 63, disease, image };
+
+  const patientImages = [images.pt1, images.pt2, images.pt3, images.pt4];
+  const image = patientImages[Math.floor(Math.random() * patientImages.length)];
+
+  const x = WIDTH / 2 - 27.5; 
+  const y = -offset; 
+
+  return { x, y, width: 150, height: 220, disease, image };
 }
 
 function resetGame() {
@@ -91,16 +116,29 @@ function resetGame() {
   patients = [createPatient()];
 }
 
-function drawText(text, x, y, size = 20, color = "black") {
+function drawText(text, x, y, size = 40, color = "black") {
   ctx.fillStyle = color;
-  ctx.font = `${size}px Nanum Gothic`;
+  ctx.font = `${size}px NanumGothic`;
   ctx.fillText(text, x, y);
 }
 
 function drawButton(text, x, y, width, height, color = "#0078FF") {
   ctx.fillStyle = color;
   ctx.fillRect(x, y, width, height);
-  drawText(text, x + 20, y + height / 2 + 5, 15, "white");
+
+  ctx.save();
+
+  ctx.fillStyle = "white";
+  ctx.font = "40px NanumGothic";
+  ctx.textAlign = "center";  
+  ctx.textBaseline = "middle";
+
+  const centerX = x + width / 2;
+  const centerY = y + height / 2;
+
+  ctx.fillText(text, centerX, centerY);
+
+  ctx.restore();
 }
 
 function drawButtonImage(image, x, y, width, height) {
@@ -115,16 +153,16 @@ canvas.addEventListener("click", (e) => {
   console.log("클릭 위치:", mx, my);
 
   if (!gameStarted) {
-    if (mx >= WIDTH / 2 - 60 && mx <= WIDTH + 60 / 2 &&
-        my >= HEIGHT / 2 + 40 && my <= HEIGHT / 2 + 90) {
+    if (mx >= WIDTH / 2 - 200 && mx <= WIDTH / 2 + 200 &&
+        my >= HEIGHT / 2 + 80 && my <= HEIGHT / 2 + 180) {
       console.log("게임 시작 버튼 클릭됨");
       gameStarted = true;
       resetGame();
       requestAnimationFrame(gameLoop);
     }
   } else if (gameOver) {
-    if (mx >= WIDTH / 2 - 75 && mx <= WIDTH / 2 + 75 &&
-        my >= HEIGHT / 2 + 40 && my <= HEIGHT / 2 + 90) {
+    if (mx >= WIDTH / 2 - 200 && mx <= WIDTH / 2 + 200 &&
+        my >= HEIGHT / 2 + 80 && my <= HEIGHT / 2 + 180) {
       console.log("다시 시작 버튼 클릭됨");
       resetGame();
       requestAnimationFrame(gameLoop);
@@ -140,21 +178,23 @@ function gameLoop() {
   if (gameStarted && !gameOver) {
     ctx.drawImage(images.background, 0, 0, WIDTH, HEIGHT);
   } else {
-    ctx.fillStyle = "white";
+    ctx.fillStyle = "#EBEBE9";
     ctx.fillRect(0, 0, WIDTH, HEIGHT);
   }
 
   if (!gameStarted) {
-    ctx.drawImage(images.bang_default, WIDTH / 2 - 45, HEIGHT / 2 - 120, 90, 80);
-    drawText("방글이를 감염되지 않게 지켜주세요", WIDTH / 2 - 110, HEIGHT / 2 - 20, 20, "black");
-    drawButton("게임 시작", WIDTH / 2 - 60, HEIGHT / 2 + 40, 120, 50);
+    ctx.drawImage(images.bang_default, WIDTH / 2 - 110, HEIGHT / 2 - 250, 200, 180);
+    drawText("방글이에게 전파주의별", WIDTH / 2 - 200, HEIGHT / 2 - 10, 40, "black");
+    drawText("적절한 보호구를 입혀주세요", WIDTH / 2 - 230, HEIGHT / 2 + 50, 40, "black");
+    drawButton("게임 시작", WIDTH / 2 - 200, HEIGHT / 2 + 80, 400, 100);
+    drawText("비말 = 마스크 / 공기 = N95 마스크 / 접촉 = 가운,장갑", WIDTH / 2 - 300, HEIGHT / 2 + 250, 30, "Red");
     return;
   }
 
   if (gameOver) {
-    ctx.drawImage(images.bang_over, WIDTH / 2 - 45, HEIGHT / 2 - 120, 90, 80);
-    drawText("감염되었습니다! 게임 종료", WIDTH / 2 - 110, HEIGHT / 2 - 20, 20, "red");
-    drawText(`당신의 점수: ${score}`, WIDTH / 2 - 60, HEIGHT / 2 + 10, 18, "black");
+    ctx.drawImage(images.bang_over, WIDTH / 2 - 110, HEIGHT / 2 - 250, 200, 180);
+    drawText("감염되었습니다! 게임 종료", WIDTH / 2 - 220, HEIGHT / 2 - 45, 40, "black");
+    drawText(`당신의 점수: ${score}`, WIDTH / 2 - 130, HEIGHT / 2 + 5, 40, "black");
 
     if (!nameEntered) {
       const playerName = prompt("이름을 입력하세요:");
@@ -162,22 +202,22 @@ function gameLoop() {
         const rankings = JSON.parse(localStorage.getItem("rankings") || "[]");
         rankings.push({ name: playerName, score });
         rankings.sort((a, b) => b.score - a.score);
-        localStorage.setItem("rankings", JSON.stringify(rankings.slice(0, 10)));
+        localStorage.setItem("rankings", JSON.stringify(rankings.slice(0, 5)));
       }
       nameEntered = true;
     }
 
     const savedRankings = JSON.parse(localStorage.getItem("rankings") || "[]");
-    drawText("방글이 지킴이 top 10", 5, 20, 18, "red");
-    savedRankings.forEach((entry, index) => {
-      drawText(`${index + 1}. ${entry.name} - ${entry.score}`, 5, 50 + index * 20, 16, "black");
+    drawTextWithBackground("방글이 지킴이 당신의 점수 top 5", 210, 30, "30px NanumGothic", "white", "blue");
+    savedRankings.slice(0, 5).forEach((entry, index) => {
+      drawText(`${index + 1}. ${entry.name} - ${entry.score}`, 320, 80 + index * 30, 30, "black");
     });
 
-    drawButton("다시 시작", WIDTH / 2 - 75, HEIGHT / 2 + 40, 150, 50);
+    drawButton("다시 시작", WIDTH / 2 - 200, HEIGHT / 2 + 60, 400, 100);
     return;
   }
 
-  const maxPatients = stage < 2 ? 1 : 2;
+  const maxPatients = stage < 5 ? 1 : 2;
   while (patients.length < maxPatients) {
     const offset = patients.length === 0 ? 0 : 300;
     patients.push(createPatient(offset));
@@ -187,7 +227,7 @@ function gameLoop() {
     const pt = patients[i];
     pt.y += speed;
     ctx.drawImage(pt.image, pt.x, pt.y, pt.width, pt.height);
-    drawText(pt.disease, pt.x, pt.y - 10, 15);
+    drawText(pt.disease, pt.x + 20, pt.y - 20, "bold 30px NanumGothic");
 
     if (pt.y + pt.height >= bang.y) {
       const correct = protectionMap[currentProtection]?.includes(pt.disease);
@@ -210,12 +250,12 @@ function gameLoop() {
   }
 
   ctx.drawImage(bangImg, bang.x, bang.y, bang.width, bang.height);
-  drawText(`스테이지: ${stage}`, 10, 35);
-  drawText(`점수: ${score}`, 130, 35);
+  drawTextWithBackground(`스테이지: ${stage}`, 10, 10, "35px NanumGothic", "white", "black");
+  drawTextWithBackground(`점수: ${score}`, 10, 65, "35px NanumGothic", "yellow", "black");
   
-drawButtonImage(images.icon_dental, WIDTH / 2 - 90, HEIGHT - 80, 60, 70);
-drawButtonImage(images.icon_n95, WIDTH / 2 - 30, HEIGHT - 80, 60, 70);
-drawButtonImage(images.icon_gown, WIDTH / 2 + 30, HEIGHT - 80, 60, 70);
+drawButtonImage(images.icon_dental, WIDTH / 2 - 250, HEIGHT - 240, 159, 234);
+drawButtonImage(images.icon_n95, WIDTH / 2 - 80, HEIGHT - 240, 166, 234);
+drawButtonImage(images.icon_gown, WIDTH / 2 + 90, HEIGHT - 240, 164, 234);
 
   requestAnimationFrame(gameLoop);
 }
