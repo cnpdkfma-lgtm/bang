@@ -217,7 +217,7 @@ function gameLoop() {
     return;
   }
 
-  const maxPatients = stage < 5 ? 1 : 2;
+  const maxPatients = stage < 3 ? 1 : 2;
   while (patients.length < maxPatients) {
     const offset = patients.length === 0 ? 0 : 300;
     patients.push(createPatient(offset));
@@ -243,10 +243,10 @@ function gameLoop() {
     }
   }
 
-  if (passedPatients >= 10 && stage < 50) {
+  if (passedPatients >= 5 && stage < 50) {
     stage += 1;
     passedPatients = 0;
-    speed += 1;
+    speed += 0.5;
   }
 
   ctx.drawImage(bangImg, bang.x, bang.y, bang.width, bang.height);
@@ -259,4 +259,5 @@ drawButtonImage(images.icon_gown, WIDTH / 2 + 90, HEIGHT - 240, 164, 234);
 
   requestAnimationFrame(gameLoop);
 }
+
 
