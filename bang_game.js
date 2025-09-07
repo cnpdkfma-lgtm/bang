@@ -281,7 +281,7 @@ function gameLoop() {
   if (passedPatients >= 5 && stage < 50) {
     stage += 1;
     passedPatients = 0;
-    speed += 0.5;
+    speed += 0.7;
   }
 
   // 방글이 이미지 및 점수 표시
@@ -298,4 +298,5 @@ function gameLoop() {
 
   requestAnimationFrame(gameLoop);
 }
+
 
