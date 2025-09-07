@@ -14,10 +14,49 @@
   </style>
 </head>
 <body>
-  <canvas id="gameCanvas" width="850" height="1400" style="border: 3px solid black;"></canvas>
+  <canvas id="gameCanvas" width="850" height="1400" style="border: 5px solid black;"></canvas>
 
   <!-- JS 연결 -->
   <script src="bang_game.js"></script>
-</body>
 
+  <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-analytics.js";
+  import { getFirestore, collection, addDoc, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyB6Pn4hvYaER8GMduVmKKQEHtLimZoKqss",
+    authDomain: "banggame-f2ae8.firebaseapp.com",
+    projectId: "banggame-f2ae8",
+    storageBucket: "banggame-f2ae8.firebasestorage.app",
+    messagingSenderId: "494771436388",
+    appId: "1:494771436388:web:30af5ee540176b8d501871",
+    measurementId: "G-8H40NRTSEK"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+  const db = getFirestore(app);
+
+  // 점수 저장 함수
+  window.saveScoreToFirebase = async function(playerName, score) {
+    await addDoc(collection(db, "rankings"), {
+      name: playerName,
+      score: score,
+      timestamp: new Date()
+    });
+  };
+
+  // 랭킹 불러오기 함수
+  window.loadTopRankings = async function(callback) {
+    const q = query(collection(db, "rankings"), orderBy("score", "desc"), limit(5));
+    const querySnapshot = await getDocs(q);
+    const rankings = [];
+    querySnapshot.forEach((doc) => {
+      rankings.push(doc.data());
+    });
+    callback(rankings);
+  };
+</script>
+</body>
 </html>
