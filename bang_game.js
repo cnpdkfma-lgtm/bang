@@ -11,6 +11,26 @@ const HEIGHT = canvas.height;
 
 let topRankings = [];
 
+const dingPool = [];
+const POOL_SIZE = 5;
+
+for (let i = 0; i < POOL_SIZE; i++) {
+  const ding = new Audio("ding.mp3");
+  dingPool.push(ding);
+}
+
+function playDingSound() {
+  for (let i = 0; i < dingPool.length; i++) {
+    const ding = dingPool[i];
+    if (ding.paused || ding.ended) {
+      ding.currentTime = 0;
+      ding.play();
+      break;
+    }
+  }
+}
+
+
 const imageSources = {
   bang_default: "img/bang.png",
   bang_dental: "img/bang_dental.png",
@@ -48,28 +68,35 @@ let bang = { x: WIDTH / 2 - 100, y: HEIGHT - 415, width: 200, height: 170 };
 let patients = [];
 let score = 0;
 let stage = 1;
-let speed = 2;
+let speed = 4;
 let currentProtection = null;
 let gameStarted = false;
 let gameOver = false;
 let passedPatients = 0;
 let nameEntered = false;
+let showHeart = false;
+let heartTimer = 0;
+let stageUpTimer = 0;
+let stageUpHandled = false;
+
 
 const protectionMap = {
-  "덴탈마스크": ["백일해", "인플루엔자"],
-  "N95": ["결핵", "수두"],
-  "가운+장갑": ["CRE", "Candida auris", "MRSA"]
+  "덴탈마스크": ["백일해", "인플루엔자", "성홍열", "유행성 이하선염", "풍진"],
+  "N95": ["결핵", "수두", "홍역", "파종성 대상포진"],
+  "가운+장갑": ["CRE", "Candida auris", "MRSA", "옴", "C.difficile", "MRAB", "MRPA", "Rotavirus"]
 };
 
-function drawTextWithBackground(text, x, y, font = "10px Arial", textColor = "white", bgColor = "black") {
+function drawTextWithBackground(text, x, y, font = "10px NanumGothic", textColor, bgColor) {
   ctx.font = font;
-  ctx.textBaseline = "top"; // 글자 기준선
+  ctx.textBaseline = "top";
   const padding = 5;
 
-  // 글자 크기 측정
   const textMetrics = ctx.measureText(text);
   const textWidth = textMetrics.width;
-  const textHeight = parseInt(font, 10); // 대략 글씨 크기
+
+  // 폰트 크기 추출
+  const fontSizeMatch = font.match(/\d+/);
+  const textHeight = fontSizeMatch ? parseInt(fontSizeMatch[0], 10) : 10;
 
   // 배경 박스 그리기
   ctx.fillStyle = bgColor;
@@ -79,6 +106,7 @@ function drawTextWithBackground(text, x, y, font = "10px Arial", textColor = "wh
   ctx.fillStyle = textColor;
   ctx.fillText(text, x, y);
 }
+
 
 //랭킹저장함수
 function saveScoreToFirebase(playerName, score) {
@@ -117,17 +145,24 @@ function setProtectionByClick(mx, my) {
   }
 }
 
+
 function createPatient(offset = 0) {
-  const diseases = ["백일해", "인플루엔자", "결핵", "수두", "CRE", "Candida auris", "MRSA"];
+  let diseases = ["인플루엔자", "성홍열", "결핵", "수두", "옴", "MRSA", "CRE"];
+  if (stage >= 3) {
+    diseases = diseases.concat(["백일해", "유행성 이하선염", "홍역", "Candida auris"]);
+  if (stage >= 5) {
+    diseases = diseases.concat(["풍진", "파종성 대상포진", "C.difficile", "MRAB", "MRPA", "Rotavirus"]);
+  }}
+
   const disease = diseases[Math.floor(Math.random() * diseases.length)];
 
   const patientImages = [images.pt1, images.pt2, images.pt3, images.pt4];
   const image = patientImages[Math.floor(Math.random() * patientImages.length)];
 
-  const x = WIDTH / 2 - 27.5; 
+  const x = WIDTH / 2 - 70; 
   const y = -offset; 
 
-  return { x, y, width: 160, height: 230, disease, image };
+  return { x, y, width: 165, height: 225, disease, image };
 }
 
 function resetGame() {
@@ -138,7 +173,7 @@ function resetGame() {
   score = 0;
   stage = 1;
   passedPatients = 0;
-  speed = 3;
+  speed = 4;
   patients = [createPatient()];
 }
 
@@ -209,7 +244,7 @@ function gameLoop() {
     ctx.fillRect(0, 0, WIDTH, HEIGHT);
   }
 
-  // 게임 시작 전 화면
+    // 게임 시작 전 화면
   if (!gameStarted) {
     ctx.drawImage(images.bang_default, WIDTH / 2 - 110, HEIGHT / 2 - 250, 200, 180);
     drawText("방글이에게 전파주의별", WIDTH / 2 - 200, HEIGHT / 2 - 10, 40, "black");
@@ -222,8 +257,23 @@ function gameLoop() {
   // 게임 오버 화면
   if (gameOver) {
     ctx.drawImage(images.bang_over, WIDTH / 2 - 110, HEIGHT / 2 - 250, 200, 180);
-    drawText("감염되었습니다! 게임 종료", WIDTH / 2 - 220, HEIGHT / 2 - 45, 40, "black");
-    drawText(`당신의 점수: ${score}`, WIDTH / 2 - 130, HEIGHT / 2 + 5, 40, "black");
+    
+      const msg1 = "방글이가 감염되었습니다";
+  ctx.font = "40px NanumGothic";
+  ctx.textBaseline = "top";
+  ctx.fillStyle = "black";
+  const msg1Width = ctx.measureText(msg1).width;
+  const msg1X = WIDTH / 2 - msg1Width / 2;
+  const msg1Y = HEIGHT / 2 - 45;
+  ctx.fillText(msg1, msg1X, msg1Y);
+
+  // 점수 메시지
+  const msg2 = `당신의 점수: ${score}`;
+  ctx.font = "bold 40px NanumGothic";
+  const msg2Width = ctx.measureText(msg2).width;
+  const msg2X = WIDTH / 2 - msg2Width / 2;
+  const msg2Y = HEIGHT / 2 + 5;
+  ctx.fillText(msg2, msg2X, msg2Y);
 
     if (!nameEntered) {
       const playerName = prompt("이름을 입력하세요:");
@@ -233,11 +283,29 @@ function gameLoop() {
       nameEntered = true;
 
       loadTopRankings((savedRankings) => {
-        drawTextWithBackground("방글이 지킴이 당신의 점수 top 5", 210, 30, "30px NanumGothic", "white", "blue");
-        savedRankings.forEach((entry, index) => {
-          drawText(`${index + 1}. ${entry.name} - ${entry.score}`, 320, 80 + index * 30, 30, "black");
-        });
+        const title = "방글이 지킴이 당신의 점수 top 5";
+        ctx.font = "bold 35px NanumGothic";
+        ctx.textBaseline = "top";
+        const titleWidth = ctx.measureText(title).width;
+        const titleX = WIDTH / 2 - titleWidth / 2;
+        const titleY = 80;
+  
+        ctx.fillStyle = "blue";
+        ctx.fillRect(titleX - 10, titleY - 10, titleWidth + 20, 60);
+        ctx.fillStyle = "white";
+        ctx.fillText(title, titleX, titleY);
 
+      // 랭킹 리스트
+      savedRankings.forEach((entry, index) => {
+        const line = `${index + 1}. ${entry.name} - ${entry.score}`;
+        ctx.font = "bold 30px NanumGothic";
+        const lineWidth = ctx.measureText(line).width;
+        const lineX = WIDTH / 2 - lineWidth / 2;
+        const lineY = 150 + index * 40;
+
+        ctx.fillStyle = "black";
+        ctx.fillText(line, lineX, lineY);
+      });
         drawButton("다시 시작", WIDTH / 2 - 200, HEIGHT / 2 + 60, 400, 100);
       });
 
@@ -249,43 +317,17 @@ function gameLoop() {
     return;
   }
 
-  // 환자 생성
-  const maxPatients = stage < 3 ? 1 : 2;
-  while (patients.length < maxPatients) {
-    const offset = patients.length === 0 ? 0 : 400;
-    patients.push(createPatient(offset));
-  }
+    // 방글이 이미지 및 점수 표시
+  ctx.drawImage(bangImg, bang.x, bang.y, bang.width, bang.height);
+  if (showHeart) {
+    drawText("♥", bang.x + 10, bang.y + 5, "bold 50px NanumGothic", "red");
+    heartTimer--;
 
-  // 환자 이동 및 충돌 처리
-  for (let i = patients.length - 1; i >= 0; i--) {
-    const pt = patients[i];
-    pt.y += speed;
-    ctx.drawImage(pt.image, pt.x, pt.y, pt.width, pt.height);
-    drawText(pt.disease, pt.x + 20, pt.y - 20, "bold 30px NanumGothic");
-
-    if (pt.y + pt.height >= bang.y) {
-      const correct = protectionMap[currentProtection]?.includes(pt.disease);
-      if (correct) {
-        score += 10;
-        passedPatients += 1;
-        patients.splice(i, 1);
-      } else {
-        gameOver = true;
-        bangImg = images.bang_over;
-        patients.splice(i, 1);
-      }
+    if (heartTimer <= 0) {
+      showHeart = false;
     }
   }
 
-  // 스테이지 증가
-  if (passedPatients >= 5 && stage < 50) {
-    stage += 1;
-    passedPatients = 0;
-    speed += 0.7;
-  }
-
-  // 방글이 이미지 및 점수 표시
-  ctx.drawImage(bangImg, bang.x, bang.y, bang.width, bang.height);
   drawTextWithBackground(`스테이지: ${stage}`, 10, 10, "35px NanumGothic", "white", "black");
   drawTextWithBackground(`점수: ${score}`, 10, 65, "35px NanumGothic", "yellow", "black");
 
@@ -296,7 +338,123 @@ function gameLoop() {
     drawButtonImage(images.icon_gown, WIDTH / 2 + 90, HEIGHT - 240, 164, 234);
   }
 
+if (stageUpTimer > 0) {
+  let messageLines = ["Level UP!", "♥♥♥♥♥♥♥"];
+
+  if (stage === 3) {
+    messageLines = ["Level UP!", "새로운 감염병 등장!"];
+  } else if (stage === 5) {
+    messageLines = ["Level UP!", "새로운 감염병 등장!"];
+  } else if (stage === 7) {
+    messageLines = [`스테이지 ${stage} 도달!`, "환자가 두명씩 등장!"];
+  } 
+
+  ctx.font = "bold 40px NanumGothic";
+  ctx.textBaseline = "top";
+
+  const centerY = HEIGHT / 2 - 100;
+  const padding = 10;
+
+  messageLines.forEach((line, i) => {
+    const textWidth = ctx.measureText(line).width;
+    const textHeight = 40; // 폰트 크기 기준
+    const x = WIDTH / 2 - textWidth / 2;
+    const y = centerY + i * 60;
+
+    // 배경 박스
+    ctx.fillStyle = i === 0 ? "black" : "black";
+    ctx.fillRect(x - padding, y - padding, textWidth + padding * 2, textHeight + padding * 2);
+
+    // 텍스트
+    ctx.fillStyle = i === 0 ? "yellow" : "white";
+    ctx.fillText(line, x, y);
+  });
+
+  stageUpTimer--;
+
+  // 레벨업 메시지가 끝난 직후 환자 초기화
+  if (stageUpTimer === 0 && !stageUpHandled) {
+    patients = [];
+    const maxPatients = stage < 7 ? 1 : 2;
+    const fixedGap = 500;
+
+    for (let i = 0; i < maxPatients; i++) {
+      const offset = i * fixedGap;
+      patients.push(createPatient(offset)); // y = -offset으로 위에서 등장
+    }
+    stageUpHandled = true;
+  }
+
   requestAnimationFrame(gameLoop);
+  return;
+}
+  
+  // 환자 생성
+  const maxPatients = stage < 7 ? 1 : 2;
+  while (patients.length < maxPatients) {
+    const fixedOffset = 400; // 속도와 무관한 고정 간격
+    const offset = patients.length === 0 ? 0 : fixedOffset;
+
+    patients.push(createPatient(offset));
+  }
+
+  // 환자 이동 및 충돌 처리
+for (let i = patients.length - 1; i >= 0; i--) {
+  const pt = patients[i];
+  pt.y += speed;
+
+  ctx.drawImage(pt.image, pt.x, pt.y, pt.width, pt.height);
+
+  const text = pt.disease || "???"; // 혹시 disease가 undefined일 경우 대비
+  ctx.font = "bold 35px NanumGothic";
+  ctx.textBaseline = "top";
+  ctx.fillStyle = "black";
+
+  const textWidth = ctx.measureText(text).width || 0;
+  const textX = pt.x + pt.width / 2 - textWidth / 2;
+  const textY = pt.y - 30;
+
+  const padding = 6;
+  const textHeight = 35;
+
+  ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
+  ctx.fillRect(textX - padding, textY - padding, textWidth + padding * 2, textHeight + padding * 2);
+
+  ctx.fillStyle = "black";
+  ctx.fillText(text, textX, textY);
+
+
+  if (pt.y + pt.height >= bang.y) {
+    const correct = protectionMap[currentProtection]?.includes(pt.disease);
+    if (correct) {
+      score += 10;
+      passedPatients += 1;
+      patients.splice(i, 1);
+      playDingSound();
+
+      showHeart = true;
+      heartTimer = 15;
+    } else {
+      gameOver = true;
+      bangImg = images.bang_over;
+      patients.splice(i, 1);
+    }
+  }
 }
 
+  // 스테이지 증가
+  if (passedPatients >= 5 && stage < 50) {
+    stage += 1;
+    passedPatients = 0;  
+ 
+  if (stage < 7) {
+    speed += 0.3; 
+  } else {
+    speed += 1;
+  }
+    stageUpTimer = 50;
+    stageUpHandled = false;
+  }
 
+  requestAnimationFrame(gameLoop);
+}
