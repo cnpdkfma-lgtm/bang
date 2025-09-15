@@ -12,22 +12,20 @@ const HEIGHT = canvas.height;
 let topRankings = [];
 
 const dingPool = [];
-const POOL_SIZE = 5;
+const POOL_SIZE = 4;
 
 for (let i = 0; i < POOL_SIZE; i++) {
   const ding = new Audio("ding.mp3");
   dingPool.push(ding);
 }
 
+let dingIndex = 0;
+
 function playDingSound() {
-  for (let i = 0; i < dingPool.length; i++) {
-    const ding = dingPool[i];
-    if (ding.paused || ding.ended) {
-      ding.currentTime = 0;
-      ding.play();
-      break;
-    }
-  }
+  const ding = dingPool[dingIndex];
+  ding.currentTime = 0;
+  ding.play();
+  dingIndex = (dingIndex + 1) % dingPool.length;
 }
 
 
@@ -44,7 +42,9 @@ const imageSources = {
   background: "img/bg.PNG",
   icon_dental: "img/mask.png",
   icon_n95: "img/n95.png",
-  icon_gown: "img/gw.png"
+  icon_gown: "img/gw.png",
+  startgame: "img/start.png",
+  overgame: "img/over.png"
 };
 
 const images = {};
@@ -214,16 +214,16 @@ canvas.addEventListener("click", (e) => {
   console.log("클릭 위치:", mx, my);
 
   if (!gameStarted) {
-    if (mx >= WIDTH / 2 - 200 && mx <= WIDTH / 2 + 200 &&
-        my >= HEIGHT / 2 + 80 && my <= HEIGHT / 2 + 180) {
+    if (mx >= WIDTH / 2 - 150 && mx <= WIDTH / 2 + 150 &&
+        my >= HEIGHT / 2 - 105 && my <= HEIGHT / 2 + 235) {
       console.log("게임 시작 버튼 클릭됨");
       gameStarted = true;
       resetGame();
       requestAnimationFrame(gameLoop);
     }
   } else if (gameOver) {
-    if (mx >= WIDTH / 2 - 200 && mx <= WIDTH / 2 + 200 &&
-        my >= HEIGHT / 2 + 80 && my <= HEIGHT / 2 + 180) {
+    if (mx >= WIDTH / 2 - 150 && mx <= WIDTH / 2 + 150 &&
+        my >= HEIGHT / 2 - 80 && my <= HEIGHT / 2 + 20) {
       console.log("다시 시작 버튼 클릭됨");
       resetGame();
       requestAnimationFrame(gameLoop);
@@ -246,67 +246,42 @@ function gameLoop() {
 
     // 게임 시작 전 화면
   if (!gameStarted) {
-    ctx.drawImage(images.bang_default, WIDTH / 2 - 110, HEIGHT / 2 - 250, 200, 180);
-    drawText("방글이에게 전파주의별", WIDTH / 2 - 200, HEIGHT / 2 - 10, 40, "black");
-    drawText("적절한 보호구를 입혀주세요", WIDTH / 2 - 230, HEIGHT / 2 + 50, 40, "black");
-    drawButton("게임 시작", WIDTH / 2 - 200, HEIGHT / 2 + 80, 400, 100);
-    drawText("비말 = 마스크 / 공기 = N95 마스크 / 접촉 = 가운,장갑", WIDTH / 2 - 300, HEIGHT / 2 + 250, 30, "Red");
+    ctx.drawImage(images.startgame, 0, 0, WIDTH, HEIGHT);
     return;
   }
 
   // 게임 오버 화면
   if (gameOver) {
-    ctx.drawImage(images.bang_over, WIDTH / 2 - 110, HEIGHT / 2 - 250, 200, 180);
-    
-      const msg1 = "방글이가 감염되었습니다";
-  ctx.font = "40px NanumGothic";
-  ctx.textBaseline = "top";
-  ctx.fillStyle = "black";
-  const msg1Width = ctx.measureText(msg1).width;
-  const msg1X = WIDTH / 2 - msg1Width / 2;
-  const msg1Y = HEIGHT / 2 - 45;
-  ctx.fillText(msg1, msg1X, msg1Y);
+    ctx.drawImage(images.overgame, 0, 0, WIDTH, HEIGHT);
 
   // 점수 메시지
-  const msg2 = `당신의 점수: ${score}`;
-  ctx.font = "bold 40px NanumGothic";
+  const msg2 = `${score} 점`;
+  ctx.font = "bold 45px NanumGothic";
+  ctx.fillStyle = "black";
   const msg2Width = ctx.measureText(msg2).width;
-  const msg2X = WIDTH / 2 - msg2Width / 2;
-  const msg2Y = HEIGHT / 2 + 5;
+  const msg2X = WIDTH / 2 + 10 ;
+  const msg2Y = HEIGHT / 2 -250;
   ctx.fillText(msg2, msg2X, msg2Y);
 
     if (!nameEntered) {
-      const playerName = prompt("이름을 입력하세요:");
+      const playerName = prompt("부서+이름(예:감염관리실 최아름)을 입력하세요");
       if (playerName) {
         saveScoreToFirebase(playerName, score);
       }
       nameEntered = true;
 
       loadTopRankings((savedRankings) => {
-        const title = "방글이 지킴이 당신의 점수 top 5";
-        ctx.font = "bold 35px NanumGothic";
-        ctx.textBaseline = "top";
-        const titleWidth = ctx.measureText(title).width;
-        const titleX = WIDTH / 2 - titleWidth / 2;
-        const titleY = 80;
-  
-        ctx.fillStyle = "blue";
-        ctx.fillRect(titleX - 10, titleY - 10, titleWidth + 20, 60);
-        ctx.fillStyle = "white";
-        ctx.fillText(title, titleX, titleY);
-
       // 랭킹 리스트
       savedRankings.forEach((entry, index) => {
-        const line = `${index + 1}. ${entry.name} - ${entry.score}`;
-        ctx.font = "bold 30px NanumGothic";
+        const line = `${entry.name}, ${entry.score}점`;
+        ctx.font = "bold 40px NanumGothic";
         const lineWidth = ctx.measureText(line).width;
-        const lineX = WIDTH / 2 - lineWidth / 2;
-        const lineY = 150 + index * 40;
+        const lineX = 220;
+        const lineY = HEIGHT / 2 + 160 + index * 110;
 
         ctx.fillStyle = "black";
         ctx.fillText(line, lineX, lineY);
       });
-        drawButton("다시 시작", WIDTH / 2 - 200, HEIGHT / 2 + 60, 400, 100);
       });
 
       return;
