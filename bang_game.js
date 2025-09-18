@@ -6,8 +6,8 @@ function startGame() {
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+canvas.width = 850;
+canvas.height = 1500;
 
 const WIDTH = canvas.width;
 const HEIGHT = canvas.height;
@@ -436,6 +436,7 @@ for (let i = patients.length - 1; i >= 0; i--) {
 
   requestAnimationFrame(gameLoop);
 }
+
 
 
 
