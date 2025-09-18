@@ -277,7 +277,7 @@ function gameLoop() {
         ctx.font = "bold 35px NanumGothic";
         const lineWidth = ctx.measureText(line).width;
         const lineX = 200;
-        const lineY = HEIGHT / 2 + 105 + index * 95;
+        const lineY = HEIGHT / 2 + 105 + index * 105;
 
         ctx.fillStyle = "#00003E";
         ctx.fillText(line, lineX, lineY);
@@ -433,4 +433,5 @@ for (let i = patients.length - 1; i >= 0; i--) {
 
   requestAnimationFrame(gameLoop);
 }
+
 
