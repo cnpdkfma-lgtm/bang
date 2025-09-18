@@ -214,16 +214,16 @@ canvas.addEventListener("click", (e) => {
   console.log("클릭 위치:", mx, my);
 
   if (!gameStarted) {
-    if (mx >= WIDTH / 2 - 150 && mx <= WIDTH / 2 + 150 &&
-        my >= HEIGHT / 2 - 105 && my <= HEIGHT / 2 + 235) {
+    if (mx >= WIDTH / 2 - 225 && mx <= WIDTH / 2 + 222 &&
+        my >= HEIGHT / 2 + 390 && my <= HEIGHT / 2 + 550) {
       console.log("게임 시작 버튼 클릭됨");
       gameStarted = true;
       resetGame();
       requestAnimationFrame(gameLoop);
     }
   } else if (gameOver) {
-    if (mx >= WIDTH / 2 - 150 && mx <= WIDTH / 2 + 150 &&
-        my >= HEIGHT / 2 - 80 && my <= HEIGHT / 2 + 20) {
+    if (mx >= WIDTH / 2 - 189 && mx <= WIDTH / 2 + 200 &&
+        my >= HEIGHT / 2 - 500 && my <= HEIGHT / 2 + 400) {
       console.log("다시 시작 버튼 클릭됨");
       resetGame();
       requestAnimationFrame(gameLoop);
@@ -257,10 +257,10 @@ function gameLoop() {
   // 점수 메시지
   const msg2 = `${score} 점`;
   ctx.font = "bold 45px NanumGothic";
-  ctx.fillStyle = "black";
+  ctx.fillStyle = "#00003E";
   const msg2Width = ctx.measureText(msg2).width;
-  const msg2X = WIDTH / 2 + 10 ;
-  const msg2Y = HEIGHT / 2 -250;
+  const msg2X = WIDTH / 2 - 56 ;
+  const msg2Y = HEIGHT / 2 -115;
   ctx.fillText(msg2, msg2X, msg2Y);
 
     if (!nameEntered) {
@@ -274,12 +274,12 @@ function gameLoop() {
       // 랭킹 리스트
       savedRankings.forEach((entry, index) => {
         const line = `${entry.name}, ${entry.score}점`;
-        ctx.font = "bold 40px NanumGothic";
+        ctx.font = "bold 35px NanumGothic";
         const lineWidth = ctx.measureText(line).width;
-        const lineX = 220;
-        const lineY = HEIGHT / 2 + 160 + index * 110;
+        const lineX = 200;
+        const lineY = HEIGHT / 2 + 105 + index * 95;
 
-        ctx.fillStyle = "black";
+        ctx.fillStyle = "#00003E";
         ctx.fillText(line, lineX, lineY);
       });
       });
@@ -433,3 +433,4 @@ for (let i = patients.length - 1; i >= 0; i--) {
 
   requestAnimationFrame(gameLoop);
 }
+
