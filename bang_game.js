@@ -37,17 +37,16 @@ const imageSources = {
   bang_dental: "img/bang_dental.png",
   bang_n95: "img/bang_n95.png",
   bang_gown: "img/bang_gown.png",
-  bang_over: "img/bang_over.png",
   pt1: "img/pt1.png",
   pt2: "img/pt2.png",
   pt3: "img/pt3.png",
   pt4: "img/pt4.png",
-  background: "img/bg.PNG",
+  background: "img/bg.jpg",
   icon_dental: "img/mask.png",
   icon_n95: "img/n95.png",
   icon_gown: "img/gw.png",
-  startgame: "img/start.png",
-  overgame: "img/over.png"
+  startgame: "img/start.jpg",
+  overgame: "img/over.jpg"
 };
 
 const images = {};
@@ -226,7 +225,7 @@ canvas.addEventListener("click", (e) => {
     }
   } else if (gameOver) {
     if (mx >= WIDTH / 2 - 189 && mx <= WIDTH / 2 + 200 &&
-        my >= HEIGHT / 2 - 500 && my <= HEIGHT / 2 + 400) {
+        my >= HEIGHT / 2 - 500 && my <= HEIGHT / 2 -387 ) {
       console.log("다시 시작 버튼 클릭됨");
       resetGame();
       requestAnimationFrame(gameLoop);
@@ -436,6 +435,7 @@ for (let i = patients.length - 1; i >= 0; i--) {
 
   requestAnimationFrame(gameLoop);
 }
+
 
 
 
