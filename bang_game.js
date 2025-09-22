@@ -141,13 +141,13 @@ function setProtectionByClick(mx, my) {
   if (mx >= WIDTH / 2 - 360 && mx <= WIDTH / 2 - 360 + 159 && my >= HEIGHT - 240 && my <= HEIGHT - 240 + 234) {
     currentProtection = "덴탈마스크";
     bangImg = images.bang_dental;
-  } else if (mx >= WIDTH / 2 - 170 && mx <= WIDTH / 2 - 170 + 166 && my >= HEIGHT - 240 && my <= HEIGHT - 240 + 234) {
+  } else if (mx >= WIDTH / 2 - 170 && mx <= WIDTH / 2 - 170 + 150 && my >= HEIGHT - 240 && my <= HEIGHT - 240 + 234) {
     currentProtection = "N95";
     bangImg = images.bang_n95;
-  } else if (mx >= WIDTH / 2 + 10 && mx <= WIDTH / 2 + 10 + 164 && my >= HEIGHT - 240 && my <= HEIGHT - 240 + 234) {
+  } else if (mx >= WIDTH / 2 + 10 && mx <= WIDTH / 2 + 10 + 150 && my >= HEIGHT - 240 && my <= HEIGHT - 240 + 234) {
     currentProtection = "가운+장갑";
     bangImg = images.bang_gown;
-  } else if (mx >= WIDTH / 2 + 180 && mx <= WIDTH / 2 + 180 + 164 && my >= HEIGHT - 240 && my <= HEIGHT - 240 + 234) {
+  } else if (mx >= WIDTH / 2 + 190 && mx <= WIDTH / 2 + 190 + 140 && my >= HEIGHT - 240 && my <= HEIGHT - 240 + 234) {
     currentProtection = "안전바늘";
     bangImg = images.bang_needle;
   }
@@ -314,14 +314,6 @@ function gameLoop() {
   drawTextWithBackground(`스테이지: ${stage}`, 10, 10, "35px NanumGothic", "white", "black");
   drawTextWithBackground(`점수: ${score}`, 10, 65, "35px NanumGothic", "yellow", "black");
 
-  // 보호구 버튼 (게임 중일 때만)
-  if (gameStarted && !gameOver) {
-    drawButtonImage(images.icon_dental, WIDTH / 2 - 360, HEIGHT - 240, 159, 234);
-    drawButtonImage(images.icon_n95, WIDTH / 2 - 170, HEIGHT - 240, 166, 234);
-    drawButtonImage(images.icon_gown, WIDTH / 2 + 10, HEIGHT - 240, 164, 234);
-    drawButtonImage(images.icon_needle, WIDTH / 2 + 190, HEIGHT - 240, 164, 234);
-  }
-
 if (stageUpTimer > 0) {
   let messageLines = ["Level UP!", "환자가 빨리 다가옵니다!"];
 
@@ -440,5 +432,6 @@ for (let i = patients.length - 1; i >= 0; i--) {
     stageUpHandled = false;
   }
 
+  
   requestAnimationFrame(gameLoop);
 }
