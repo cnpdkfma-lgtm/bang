@@ -37,6 +37,7 @@ const imageSources = {
   bang_dental: "img/bang_dental.png",
   bang_n95: "img/bang_n95.png",
   bang_gown: "img/bang_gown.png",
+  bang_needle: "img/bang_needle.png",
   pt1: "img/pt1.png",
   pt2: "img/pt2.png",
   pt3: "img/pt3.png",
@@ -45,6 +46,7 @@ const imageSources = {
   icon_dental: "img/mask.png",
   icon_n95: "img/n95.png",
   icon_gown: "img/gw.png",
+  icon_needle: "img/needle.png",
   startgame: "img/start.jpg",
   overgame: "img/over.jpg"
 };
@@ -85,7 +87,8 @@ let stageUpHandled = false;
 const protectionMap = {
   "덴탈마스크": ["백일해", "인플루엔자", "성홍열", "유행성 이하선염", "풍진"],
   "N95": ["결핵", "수두", "홍역", "파종성 대상포진"],
-  "가운+장갑": ["CRE", "Candida auris", "MRSA", "옴", "C.difficile", "MRAB", "MRPA", "Rotavirus"]
+  "가운+장갑": ["CRE", "Candida auris", "MRSA", "옴", "C.difficile", "MRAB", "MRPA", "Rotavirus"],
+  "안전바늘" : ["C형간염","B형간염","HIV"]
 };
 
 function drawTextWithBackground(text, x, y, font = "10px NanumGothic", textColor, bgColor) {
@@ -135,23 +138,26 @@ function loadTopRankings(callback) {
 
 
 function setProtectionByClick(mx, my) {
-  if (mx >= WIDTH / 2 - 250 && mx <= WIDTH / 2 - 250 + 159 && my >= HEIGHT - 240 && my <= HEIGHT - 240 + 234) {
+  if (mx >= WIDTH / 2 - 360 && mx <= WIDTH / 2 - 360 + 159 && my >= HEIGHT - 240 && my <= HEIGHT - 240 + 234) {
     currentProtection = "덴탈마스크";
     bangImg = images.bang_dental;
-  } else if (mx >= WIDTH / 2 - 80 && mx <= WIDTH / 2 - 80 + 166 && my >= HEIGHT - 240 && my <= HEIGHT - 240 + 234) {
+  } else if (mx >= WIDTH / 2 - 170 && mx <= WIDTH / 2 - 170 + 166 && my >= HEIGHT - 240 && my <= HEIGHT - 240 + 234) {
     currentProtection = "N95";
     bangImg = images.bang_n95;
-  } else if (mx >= WIDTH / 2 + 90 && mx <= WIDTH / 2 + 90 + 164 && my >= HEIGHT - 240 && my <= HEIGHT - 240 + 234) {
+  } else if (mx >= WIDTH / 2 + 10 && mx <= WIDTH / 2 + 10 + 164 && my >= HEIGHT - 240 && my <= HEIGHT - 240 + 234) {
     currentProtection = "가운+장갑";
     bangImg = images.bang_gown;
+  } else if (mx >= WIDTH / 2 + 180 && mx <= WIDTH / 2 + 180 + 164 && my >= HEIGHT - 240 && my <= HEIGHT - 240 + 234) {
+    currentProtection = "안전바늘";
+    bangImg = images.bang_needle;
   }
 }
 
 
 function createPatient(offset = 0) {
-  let diseases = ["인플루엔자", "성홍열", "결핵", "수두", "옴", "MRSA", "CRE"];
+  let diseases = ["인플루엔자", "성홍열", "결핵", "수두", "옴", "MRSA", "CRE","HIV"];
   if (stage >= 3) {
-    diseases = diseases.concat(["백일해", "유행성 이하선염", "홍역", "Candida auris"]);
+    diseases = diseases.concat(["백일해", "유행성 이하선염", "홍역", "Candida auris","B형간염","C형간염"]);
   if (stage >= 5) {
     diseases = diseases.concat(["풍진", "파종성 대상포진", "C.difficile", "MRAB", "MRPA", "Rotavirus"]);
   }}
@@ -225,7 +231,7 @@ canvas.addEventListener("click", (e) => {
     }
   } else if (gameOver) {
     if (mx >= WIDTH / 2 - 189 && mx <= WIDTH / 2 + 200 &&
-        my >= HEIGHT / 2 - 500 && my <= HEIGHT / 2 -387 ) {
+        my >= HEIGHT / 2 - 500 && my <= HEIGHT / 2 -387) {
       console.log("다시 시작 버튼 클릭됨");
       resetGame();
       requestAnimationFrame(gameLoop);
@@ -310,13 +316,14 @@ function gameLoop() {
 
   // 보호구 버튼 (게임 중일 때만)
   if (gameStarted && !gameOver) {
-    drawButtonImage(images.icon_dental, WIDTH / 2 - 250, HEIGHT - 240, 159, 234);
-    drawButtonImage(images.icon_n95, WIDTH / 2 - 80, HEIGHT - 240, 166, 234);
-    drawButtonImage(images.icon_gown, WIDTH / 2 + 90, HEIGHT - 240, 164, 234);
+    drawButtonImage(images.icon_dental, WIDTH / 2 - 360, HEIGHT - 240, 159, 234);
+    drawButtonImage(images.icon_n95, WIDTH / 2 - 170, HEIGHT - 240, 166, 234);
+    drawButtonImage(images.icon_gown, WIDTH / 2 + 10, HEIGHT - 240, 164, 234);
+    drawButtonImage(images.icon_needle, WIDTH / 2 + 190, HEIGHT - 240, 164, 234);
   }
 
 if (stageUpTimer > 0) {
-  let messageLines = ["Level UP!", "♥♥♥♥♥♥♥"];
+  let messageLines = ["Level UP!", "환자가 빨리 다가옵니다!"];
 
   if (stage === 3) {
     messageLines = ["Level UP!", "새로운 감염병 등장!"];
@@ -420,25 +427,18 @@ for (let i = patients.length - 1; i >= 0; i--) {
 }
 
   // 스테이지 증가
-  if (passedPatients >= 5 && stage < 50) {
+  if (passedPatients >= 10 && stage < 50) {
     stage += 1;
     passedPatients = 0;  
  
   if (stage < 7) {
-    speed += 0.3; 
+    speed += 0.4; 
   } else {
-    speed += 1;
-  }
+    speed += 0.6;
+    }
     stageUpTimer = 50;
     stageUpHandled = false;
   }
 
   requestAnimationFrame(gameLoop);
 }
-
-
-
-
-
-
-
