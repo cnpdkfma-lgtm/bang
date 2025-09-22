@@ -43,10 +43,6 @@ const imageSources = {
   pt3: "img/pt3.png",
   pt4: "img/pt4.png",
   background: "img/bg.jpg",
-  icon_dental: "img/mask.png",
-  icon_n95: "img/n95.png",
-  icon_gown: "img/gw.png",
-  icon_needle: "img/needle.png",
   startgame: "img/start.jpg",
   overgame: "img/over.jpg"
 };
@@ -435,3 +431,4 @@ for (let i = patients.length - 1; i >= 0; i--) {
   
   requestAnimationFrame(gameLoop);
 }
+
