@@ -15,8 +15,12 @@
 #gameCanvas {
   display: block;
   margin: 0 auto;
+  width: 100%;         /* ✅ 화면 너비에 맞게 축소 */
+  height: auto;        /* ✅ 비율 유지 */
+  max-width: 850px;    /* ✅ 데스크탑에서는 최대 크기 유지 */
   border: 5px solid black;
 }
+
 
 #startScreen {
   position: absolute;
@@ -62,7 +66,7 @@
     <button onclick="handleStart()">게임 시작</button>
   </div>
 </div>
-   <canvas id="gameCanvas" width="850" height="1500" style="display:none;"></canvas>
+   <canvas id="gameCanvas" width="850" height="1500"></canvas>
 
   <!-- JS 연결 -->
   <script src="bang_game.js"></script>
@@ -131,6 +135,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebas
 </body>
 
 </html>
+
 
 
 
