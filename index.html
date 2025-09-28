@@ -22,13 +22,15 @@
 }
 
 #gameCanvas {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  display: block;
+  width: 100vw;      
+  height: 100vh;      
+  max-width: 850px;   
+  max-height: 1500px; 
+  margin: 0 auto;
   border: 5px solid black;
-  z-index: 1;
 }
+
 
 #startScreen {
   position: absolute;
@@ -138,6 +140,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebas
 </body>
 
 </html>
+
 
 
 
