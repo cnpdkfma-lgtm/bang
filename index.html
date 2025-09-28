@@ -2,6 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>방글이를 지켜라</title>
   <style>
     body {
@@ -14,12 +15,11 @@
 }
 
 #gameCanvas {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  border: 5px solid black;
-  z-index: 1;
+  width: 100%;
+  height: auto;
+  max-width: 850px;
+  display: block;
+  margin: 0 auto;
 }
 
 #startScreen {
@@ -129,6 +129,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebas
 </body>
 
 </html>
+
 
 
 
