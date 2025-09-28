@@ -17,20 +17,6 @@ let topRankings = [];
 const dingPool = [];
 const POOL_SIZE = 4;
 
-for (let i = 0; i < POOL_SIZE; i++) {
-  const ding = new Audio("ding.mp3");
-  dingPool.push(ding);
-}
-
-let dingIndex = 0;
-
-function playDingSound() {
-  const ding = dingPool[dingIndex];
-  ding.currentTime = 0;
-  ding.play();
-  dingIndex = (dingIndex + 1) % dingPool.length;
-}
-
 
 const imageSources = {
   bang_default: "img/bang.png",
@@ -110,9 +96,10 @@ function drawTextWithBackground(text, x, y, font = "10px NanumGothic", textColor
 
 
 //랭킹저장함수
-function saveScoreToFirebase(playerName, score) {
+function saveScoreToFirebase(playerName, department, score) {
   db.collection("rankings").add({
     name: playerName,
+    department: department,
     score: score,
     timestamp: firebase.firestore.FieldValue.serverTimestamp()
   });
@@ -256,45 +243,35 @@ function gameLoop() {
 
   // 게임 오버 화면
   if (gameOver) {
-    ctx.drawImage(images.overgame, 0, 0, WIDTH, HEIGHT);
+  ctx.drawImage(images.overgame, 0, 0, WIDTH, HEIGHT);
 
-  // 점수 메시지
   const msg2 = `${score} 점`;
   ctx.font = "bold 45px NanumGothic";
   ctx.fillStyle = "#00003E";
-  const msg2Width = ctx.measureText(msg2).width;
-  const msg2X = WIDTH / 2 - 56 ;
-  const msg2Y = HEIGHT / 2 -115;
-  ctx.fillText(msg2, msg2X, msg2Y);
+  ctx.fillText(msg2, WIDTH / 2 - 56, HEIGHT / 2 - 115);
 
-    if (!nameEntered) {
-      const playerName = prompt("부서+이름(예:감염관리실 최아름)을 입력하세요");
-      if (playerName) {
-        saveScoreToFirebase(playerName, score);
-      }
-      nameEntered = true;
-
-      loadTopRankings((savedRankings) => {
-      // 랭킹 리스트
-      savedRankings.forEach((entry, index) => {
-        const line = `${entry.name}, ${entry.score}점`;
-        ctx.font = "bold 35px NanumGothic";
-        const lineWidth = ctx.measureText(line).width;
-        const lineX = 200;
-        const lineY = HEIGHT / 2 + 110 + index * 102.8;
-
-        ctx.fillStyle = "#00003E";
-        ctx.fillText(line, lineX, lineY);
-      });
-      });
-
-      return;
-    }
-
-    // 이름 입력 후에는 바로 버튼만 보여줌
-    drawButton("다시 시작", WIDTH / 2 - 200, HEIGHT / 2 + 60, 400, 100);
-    return;
+  if (!window.playerInfo && !document.getElementById("inputOverlay").style.display.includes("block")) {
+    document.getElementById("inputOverlay").style.display = "block";
   }
+
+  if (gameOver && !nameEntered && window.playerInfo) {
+    const { playerName, department } = window.playerInfo;
+    saveScoreToFirebase(playerName, department, score);
+    nameEntered = true;
+
+    loadTopRankings((savedRankings) => {
+      savedRankings.forEach((entry, index) => {
+        const line = `${entry.department}, ${entry.name}, ${entry.score}점`;
+        ctx.font = "bold 35px NanumGothic";
+        ctx.fillStyle = "#00003E";
+        ctx.fillText(line, 200, HEIGHT / 2 + 110 + index * 102.8);
+      });
+    });
+  }
+
+  return;
+}
+
 
     // 방글이 이미지 및 점수 표시
   ctx.drawImage(bangImg, bang.x, bang.y, bang.width, bang.height);
@@ -402,7 +379,6 @@ for (let i = patients.length - 1; i >= 0; i--) {
       score += 10;
       passedPatients += 1;
       patients.splice(i, 1);
-      playDingSound();
 
       showHeart = true;
       heartTimer = 15;
@@ -431,4 +407,24 @@ for (let i = patients.length - 1; i >= 0; i--) {
   
   requestAnimationFrame(gameLoop);
 }
+
+window.playerInfo = null;
+
+window.handleStart = function() {
+  const department = document.getElementById("departmentInput").value.trim();
+  const name = document.getElementById("nameInput").value.trim();
+
+  if (!department || !name) {
+    alert("부서와 이름을 모두 입력해주세요.");
+    return;
+  }
+
+  window.playerInfo = { department, playerName: name };
+
+  document.getElementById("startScreen").style.display = "none";
+  document.getElementById("gameCanvas").style.display = "block";
+
+    requestAnimationFrame(gameLoop);
+};
+
 
