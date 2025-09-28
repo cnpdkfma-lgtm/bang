@@ -28,25 +28,34 @@
   left: 50%;
   transform: translate(-50%, -50%);
   background: rgba(255, 255, 255, 0.95);
-  padding: 20px 30px;
+  padding: 20px;
   border: 2px solid black;
   z-index: 2;
   box-shadow: 0 0 10px rgba(0,0,0,0.3);
-  font-size: 25px;
+  font-size: 18px;
   text-align: center;
+  width: 80vw;           /* ✅ 모바일 화면 기준 너비 */
+  max-width: 400px;      /* ✅ 데스크탑에서는 최대 너비 제한 */
+  border-radius: 12px;
 }
 
 #startScreen input {
-  width: 350px;
-  padding: 25px;
+  width: 100%;
+  padding: 12px;
   margin-bottom: 15px;
-  font-size: 25px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
 }
 
 #startScreen button {
-  padding: 20px 40px;
-  font-size: 25px;
+  padding: 12px 24px;
+  font-size: 16px;
   cursor: pointer;
+  background-color: #00003E;
+  color: white;
+  border: none;
+  border-radius: 8px;
 }
 
   </style>
@@ -129,6 +138,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebas
 </body>
 
 </html>
+
 
 
 
