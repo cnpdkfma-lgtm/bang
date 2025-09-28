@@ -5,21 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>방글이를 지켜라</title>
   <style>
-    body {
+   body {
   margin: 0;
   padding: 0;
-  height: 100vh;
-  overflow: hidden;
-  position: relative;
   background-color: #f0f0f0;
+  text-align: center;
 }
 
 #gameCanvas {
-  width: 100%;
-  height: auto;
-  max-width: 850px;
   display: block;
   margin: 0 auto;
+  border: 5px solid black;
 }
 
 #startScreen {
@@ -28,15 +24,13 @@
   left: 50%;
   transform: translate(-50%, -50%);
   background: rgba(255, 255, 255, 0.95);
-  padding: 20px;
+  padding: 20px 30px;
   border: 2px solid black;
-  z-index: 2;
   box-shadow: 0 0 10px rgba(0,0,0,0.3);
   font-size: 18px;
-  text-align: center;
-  width: 90vw;           /* ✅ 모바일 화면 기준 너비 */
-  max-width: 400px;      /* ✅ 데스크탑에서는 최대 너비 제한 */
+  width: 400px;
   border-radius: 12px;
+  z-index: 2;
 }
 
 #startScreen input {
@@ -137,6 +131,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebas
 </body>
 
 </html>
+
 
 
 
