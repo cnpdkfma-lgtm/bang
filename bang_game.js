@@ -6,6 +6,45 @@ function startGame() {
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
+canvas.addEventListener("click", handleInput);
+canvas.addEventListener("touchstart", function(e) {
+  e.preventDefault(); 
+  handleInput(e);
+}, { passive: false });
+
+function handleInput(e) {
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+
+  let clientX, clientY;
+
+  if (e.type.startsWith("touch")) {
+    clientX = e.touches[0].clientX;
+    clientY = e.touches[0].clientY;
+  } else {
+    clientX = e.clientX;
+    clientY = e.clientY;
+  }
+
+  const mx = (clientX - rect.left) * scaleX;
+  const my = (clientY - rect.top) * scaleY;
+
+  if (!gameStarted) {
+    if (mx >= WIDTH / 2 - 225 && mx <= WIDTH / 2 + 222 &&
+        my >= HEIGHT / 2 + 390 && my <= HEIGHT / 2 + 550) {
+      console.log("게임 시작 버튼 클릭됨");
+      gameStarted = true;
+      resetGame();
+      requestAnimationFrame(gameLoop);
+    }
+  }
+}
+
+canvas.addEventListener("click", handleInput);
+canvas.addEventListener("touchstart", handleInput);
+
+
 canvas.width = 850;
 canvas.height = 1500;
 
@@ -426,5 +465,6 @@ window.handleStart = function() {
 
     requestAnimationFrame(gameLoop);
 };
+
 
 
