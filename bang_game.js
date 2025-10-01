@@ -12,6 +12,7 @@ canvas.addEventListener("touchstart", function(e) {
   handleInput(e);
 }, { passive: false });
 
+
 function handleInput(e) {
   const rect = canvas.getBoundingClientRect();
   const scaleX = canvas.width / rect.width;
@@ -39,11 +40,21 @@ function handleInput(e) {
       requestAnimationFrame(gameLoop);
     }
   }
+  else if (gameOver) {
+    if (mx >= WIDTH / 2 - 189 && mx <= WIDTH / 2 + 200 &&
+        my >= HEIGHT / 2 - 500 && my <= HEIGHT / 2 -387) {
+      console.log("다시 시작 버튼 클릭됨");
+      resetGame();
+      requestAnimationFrame(gameLoop);
+    }
+  } else {
+    // 게임 중일 때 보호구 버튼 클릭 처리
+    setProtectionByClick(mx, my);
+  }
 }
 
 canvas.addEventListener("click", handleInput);
 canvas.addEventListener("touchstart", handleInput);
-
 
 canvas.width = 850;
 canvas.height = 1500;
@@ -235,34 +246,6 @@ function drawButton(text, x, y, width, height, color = "#0078FF") {
 function drawButtonImage(image, x, y, width, height) {
   ctx.drawImage(image, x, y, width, height);
 }
-
-canvas.addEventListener("click", (e) => {
-  const rect = canvas.getBoundingClientRect();
-  const mx = e.clientX - rect.left;
-  const my = e.clientY - rect.top;
-
-  console.log("클릭 위치:", mx, my);
-
-  if (!gameStarted) {
-    if (mx >= WIDTH / 2 - 225 && mx <= WIDTH / 2 + 222 &&
-        my >= HEIGHT / 2 + 390 && my <= HEIGHT / 2 + 550) {
-      console.log("게임 시작 버튼 클릭됨");
-      gameStarted = true;
-      resetGame();
-      requestAnimationFrame(gameLoop);
-    }
-  } else if (gameOver) {
-    if (mx >= WIDTH / 2 - 189 && mx <= WIDTH / 2 + 200 &&
-        my >= HEIGHT / 2 - 500 && my <= HEIGHT / 2 -387) {
-      console.log("다시 시작 버튼 클릭됨");
-      resetGame();
-      requestAnimationFrame(gameLoop);
-    }
-  } else {
-    // 게임 중일 때 보호구 버튼 클릭 처리
-    setProtectionByClick(mx, my);
-  }
-});
 
 function gameLoop() {
   ctx.clearRect(0, 0, WIDTH, HEIGHT);
@@ -464,7 +447,5 @@ window.handleStart = function() {
   document.getElementById("gameCanvas").style.display = "block";
 
     requestAnimationFrame(gameLoop);
+
 };
-
-
-
