@@ -429,23 +429,3 @@ for (let i = patients.length - 1; i >= 0; i--) {
   
   requestAnimationFrame(gameLoop);
 }
-
-window.playerInfo = null;
-
-window.handleStart = function() {
-  const department = document.getElementById("departmentInput").value.trim();
-  const name = document.getElementById("nameInput").value.trim();
-
-  if (!department || !name) {
-    alert("부서와 이름을 모두 입력해주세요.");
-    return;
-  }
-
-  window.playerInfo = { department, playerName: name };
-
-  document.getElementById("startScreen").style.display = "none";
-  document.getElementById("gameCanvas").style.display = "block";
-
-    requestAnimationFrame(gameLoop);
-
-};
