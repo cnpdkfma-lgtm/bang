@@ -31,6 +31,10 @@ function handleInput(e) {
   const mx = (clientX - rect.left) * scaleX;
   const my = (clientY - rect.top) * scaleY;
 
+   if (isRankingScreen) {
+    return;
+  }
+  
   if (!gameStarted) {
     if (mx >= WIDTH / 2 - 225 && mx <= WIDTH / 2 + 222 &&
         my >= HEIGHT / 2 + 390 && my <= HEIGHT / 2 + 550) {
@@ -51,11 +55,15 @@ function handleInput(e) {
 
     // 그만하기 버튼
     else if (mx >= WIDTH / 2 - 245 && mx <= WIDTH / 2 + 220 &&
-             my >= HEIGHT / 2 + 17 && my <= HEIGHT / 2 + 135 ) {
-      console.log("그만하기 버튼 클릭됨");
-      showRankingScreen();
-    }
-  } else {
+             my >= HEIGHT / 2 + 17 && my <= HEIGHT / 2 + 135 ) {
+      console.log("그만하기 버튼 클릭됨");
+      // ⚠️ 랭킹 화면 상태로 전환하고 랭킹을 보여줍니다.
+      isRankingScreen = true; // 상태 변경
+      showRankingScreen(); // 최초 1회만 호출됨 (위에서 제어)
+      return; 
+    }
+  } 
+    else {
     // 게임 중일 때 보호구 버튼 클릭 처리
     setProtectionByClick(mx, my);
   }
@@ -125,6 +133,7 @@ let showHeart = false;
 let heartTimer = 0;
 let stageUpTimer = 0;
 let stageUpHandled = false;
+let isRankingScreen = false;
 
 
 const protectionMap = {
@@ -171,16 +180,19 @@ function loadTopRankings(callback) {
 }
 //랭킹 보기 함수
 function showRankingScreen() {
-  ctx.drawImage(images.ranking, 0, 0, WIDTH, HEIGHT); 
+    ctx.drawImage(images.ranking, 0, 0, WIDTH, HEIGHT);
 
-  loadTopRankings((savedRankings) => {
-    savedRankings.forEach((entry, index) => {
-      const line = `${entry.department}, ${entry.name}, ${entry.score}점`;
-      ctx.font = "bold 40px NanumGothic";
-      ctx.fillStyle = "#00003E";
-      ctx.fillText(line, WIDTH / 2 -185, HEIGHT / 2 -460 + index * 180);
+    // 랭킹 데이터는 단 한 번만 불러옵니다!
+    loadTopRankings((savedRankings) => {
+        // ... (랭킹 그리는 기존 코드)
+        savedRankings.forEach((entry, index) => {
+          const line = `${entry.department}, ${entry.name}, ${entry.score}점`;
+          ctx.font = "bold 40px NanumGothic";
+          ctx.fillStyle = "#00003E";
+          // 랭킹 위치 조정 (index 0, 1, 2, 3, 4 순서대로 잘 보이게)
+          ctx.fillText(line, WIDTH / 2 -185, HEIGHT / 2 -460 + index * 180); 
+        });
     });
-  });
 }
 
 
@@ -239,6 +251,11 @@ function drawText(text, x, y, size = 40, color = "black") {
 }
 
 function gameLoop() {
+  // 랭킹 화면일 경우, 캔버스 업데이트를 중단합니다.
+    if (isRankingScreen) {
+        // 이미 showRankingScreen에서 랭킹을 그렸으므로, 여기서는 아무것도 하지 않고 종료합니다.
+        return; 
+    }
   ctx.clearRect(0, 0, WIDTH, HEIGHT);
 
   if (gameStarted && !gameOver) {
@@ -408,3 +425,4 @@ for (let i = patients.length - 1; i >= 0; i--) {
   
   requestAnimationFrame(gameLoop);
 }
+
