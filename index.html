@@ -120,14 +120,13 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebas
       timestamp: new Date()
     });
 
-    // ✅ 저장 성공 알림
-    // alert("점수 저장 성공!");
-  } //catch (error) {
-    // ❌ 저장 실패 알림
-    //console.error("❌ 저장 실패:", error);
-    ///alert("⚠️ 점수 화면을 캡쳐해서 \n감염관리실 최아름에게 보내주세요.\n오류 코드: " + error.message);
-  }
-//};
+    console.log("점수 저장 성공!");
+    } catch (error) {
+        console.error("❌ 저장 실패:", error);
+        // 사용자에게는 콘솔을 통해 오류를 알립니다. (알림 UI 제거)
+        console.log(`⚠️ 점수 저장 실패. 오류 코드: ${error.message}`);
+    }
+};
 
   // 랭킹 불러오기 함수
   window.loadTopRankings = async function(callback) {
@@ -163,6 +162,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebas
 </script>
 </body>
 </html>
+
 
 
 
