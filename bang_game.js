@@ -35,7 +35,6 @@ const imageSources = {
     bang_n95: "img/bang_n95.png",
     bang_gown: "img/bang_gown.png",
     bang_needle: "img/bang_needle.png",
-    bang_over: "img/bang_over.png",
     pt1: "img/pt1.png",
     pt2: "img/pt2.png",
     pt3: "img/pt3.png",
@@ -439,6 +438,7 @@ function gameLoop() {
 
     requestAnimationFrame(gameLoop);
 }
+
 
 
 
