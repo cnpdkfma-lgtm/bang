@@ -93,10 +93,10 @@ canvas {
 
   <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-analytics.js";
+  // import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-analytics.js";
   import { getFirestore, collection, addDoc, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
 
-  const firebaseConfig = {
+  // const firebaseConfig = {
     apiKey: "AIzaSyB6Pn4hvYaER8GMduVmKKQEHtLimZoKqss",
     authDomain: "banggame-f2ae8.firebaseapp.com",
     projectId: "banggame-f2ae8",
@@ -107,7 +107,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebas
   };
 
   const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
+  // const analytics = getAnalytics(app);
   const db = getFirestore(app);
 
   // 점수 저장 함수
@@ -163,6 +163,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebas
 </script>
 </body>
 </html>
+
 
 
 
