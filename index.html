@@ -1,102 +1,113 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>방글이를 지켜라</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+            text-align: center;
+            overflow-x: hidden; /* 좌우 스크롤 방지 */
+            font-family: 'Nanum Gothic', sans-serif;
+        }
 
-  <title>방글이를 지켜라</title>
-  <style>
-   body {
-  margin: 0;
-  padding: 0;
-  background-color: #f0f0f0;
-  text-align: center;
-  overflow-x: hidden; //좌우 스크롤 방지//
-}
+        #gameCanvas {
+            width: 93%;
+            height: auto;
+            max-width: 850px;
+            display: block;
+            margin: 0.5vh auto 2vh auto;
+            padding : 5px;
+            touch-action: manipulation;
+            aspect-ratio: 17 / 30; /* 850/1500 비율 */
+        }
 
-#gameCanvas {
-  width: 93%;
-  height: auto;
-  max-width: 850px;
-  display: block;
-  margin: 0.5vh auto 2vh auto;
-  padding : 5px;
-  touch-action: manipulation;
-  asepct-ratio: 17 / 30;      ////850/1500 비율임
-}
+        canvas {
+            touch-action: manipulation;
+        }
 
-canvas {
-  touch-action: manipulation;
-}
-
-#startScreen {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: rgba(255, 255, 255, 0.95);
-  padding: 5vw 6vw;              /* 화면 너비 기준 여백 */
-  border: 2px solid black;
-  box-shadow: 0 0 10px rgba(0,0,0,0.3);
-  font-size: 1rem;               /* 반응형 글씨 크기 */
-  width: 90%;                    /* 화면 너비의 90% */
-  max-width: 350px;              /* 너무 커지지 않도록 제한 */
-  border-radius: 12px;
-  z-index: 2;
-  box-sizing: border-box;        /* padding 포함한 너비 계산 */
-}
-
-
-#startScreen input {
-  width: 100%;
-  padding: 12px;
-  margin-bottom: 15px;
-  font-size: 16px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-}
-
-#startScreen button {
-  padding: 12px 24px;
-  font-size: 16px;
-  cursor: pointer;
-  background-color: #00003E;
-  color: white;
-  border: none;
-  border-radius: 8px;
-}
-
-@media (max-width: 400px) {
-  #startScreen {
-    width: 90%;
-    font-size: 13px;
-  }
-}
+        #startScreen {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.95);
+            padding: 5vw 6vw;
+            border: 2px solid black;
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+            font-size: 1rem;
+            width: 90%;
+            max-width: 350px;
+            border-radius: 12px;
+            z-index: 2;
+            box-sizing: border-box;
+            display: flex; /* Flexbox 추가 */
+            flex-direction: column; /* 세로 정렬 */
+            align-items: center;
+        }
 
 
-  </style>
-  
+        #startScreen input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+
+        #startScreen button {
+            padding: 12px 24px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #00003E;
+            color: white;
+            border: none;
+            border-radius: 8px;
+        }
+        
+        #alertMessage {
+             color: red; 
+             font-size: 14px; 
+             margin-bottom: 10px;
+        }
+
+        @media (max-width: 400px) {
+            #startScreen {
+                width: 90%;
+                font-size: 13px;
+            }
+        }
+    </style>
 </head>
 <body>
-  
-  <div id="startScreen">
-    <h2>게임 시작 전 정보를 입력해주세요</h2>
-    <input id="departmentInput" placeholder="부서 (예: 감염관리실)" /><br><br>
-    <input id="nameInput" placeholder="이름 (예: 최아름)" /><br><br>
-    <button onclick="handleStart()">게임 시작</button>
-  </div>
-</div>
-   <canvas id="gameCanvas" width="850" height="1500" style="display:none;"></canvas>
+    
+    <!-- bang_game.js를 모듈보다 먼저 로드하여 startGame() 정의가 확실하게 완료되도록 합니다. -->
+    <script src="bang_game.js"></script>
 
-  <!-- JS 연결 -->
-  <script src="bang_game.js"></script>
+    <div id="startScreen">
+        <h2>게임 시작 전 정보를 입력해주세요</h2>
+        <!-- alertMessage div가 startScreen 내부에 있어야 접근이 용이합니다. -->
+        <div id="alertMessage"></div> 
+        <input id="departmentInput" placeholder="부서 (예: 감염관리실)" /><br>
+        <input id="nameInput" placeholder="이름 (예: 최아름)" /><br>
+        <!-- handleStart()는 window.handleStart로 정의되었으므로 window. 없이 호출합니다. -->
+        <button onclick="handleStart()">게임 시작</button>
+    </div>
 
-  <script type="module">
+    <!-- 캔버스는 시작 화면과 같은 레벨에 있어야 합니다. -->
+    <canvas id="gameCanvas" width="850" height="1500" style="display:none;"></canvas>
+
+<script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
-  // import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-analytics.js";
-  import { getFirestore, collection, addDoc, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+// import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-analytics.js";
+import { getFirestore, collection, addDoc, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
 
-  const firebaseConfig = {
+const firebaseConfig = {
     apiKey: "AIzaSyB6Pn4hvYaER8GMduVmKKQEHtLimZoKqss",
     authDomain: "banggame-f2ae8.firebaseapp.com",
     projectId: "banggame-f2ae8",
@@ -104,23 +115,23 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebas
     messagingSenderId: "494771436388",
     appId: "1:494771436388:web:30af5ee540176b8d501871",
     measurementId: "G-8H40NRTSEK"
-  };
+};
 
-  const app = initializeApp(firebaseConfig);
-  // const analytics = getAnalytics(app);
-  const db = getFirestore(app);
+const app = initializeApp(firebaseConfig);
+// const analytics = getAnalytics(app);
+const db = getFirestore(app);
 
-  // 점수 저장 함수
-   window.saveScoreToFirebase = async function(playerName, department, score) {
-  try {
-    await addDoc(collection(db, "rankings"), {
-      name: playerName,
-      department: department,
-      score: score,
-      timestamp: new Date()
-    });
+// 점수 저장 함수
+window.saveScoreToFirebase = async function(playerName, department, score) {
+    try {
+        await addDoc(collection(db, "rankings"), {
+            name: playerName,
+            department: department,
+            score: score,
+            timestamp: new Date()
+        });
 
-    console.log("점수 저장 성공!");
+        console.log("점수 저장 성공!");
     } catch (error) {
         console.error("❌ 저장 실패:", error);
         // 사용자에게는 콘솔을 통해 오류를 알립니다. (알림 UI 제거)
@@ -128,40 +139,54 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebas
     }
 };
 
-  // 랭킹 불러오기 함수
-  window.loadTopRankings = async function(callback) {
+// 랭킹 불러오기 함수
+window.loadTopRankings = async function(callback) {
+    // 랭킹은 score 내림차순만 사용하고, timestamp는 색인 생성에만 사용합니다.
+    // ⚠️ 경고: 색인이 아직 적용 중이거나 없는 경우, 이 쿼리가 여전히 $100+$ Reads를 유발합니다.
     const q = query(collection(db, "rankings"), orderBy("score", "desc"), limit(5));
     const querySnapshot = await getDocs(q);
     const rankings = [];
     querySnapshot.forEach((doc) => {
-      rankings.push(doc.data());
+        rankings.push(doc.data());
     });
     callback(rankings);
-  };
+};
 
-  window.playerInfo = null;
+window.playerInfo = null;
 
-  window.handleStart = function() {
+// 게임 시작 핸들러 (window에 명시적으로 할당)
+window.handleStart = function() {
     const department = document.getElementById("departmentInput").value.trim();
     const name = document.getElementById("nameInput").value.trim();
+    const alertMsg = document.getElementById("alertMessage");
 
     if (!department || !name) {
-      alert("부서와 이름을 모두 입력해주세요.");
-      return;
+        // 🚨 alert() 대신 안전하게 HTML 메시지를 사용합니다.
+        alertMsg.innerText = "부서와 이름을 모두 입력해주세요.";
+        return;
     }
+    alertMsg.innerText = ""; // 메시지 초기화
 
     window.playerInfo = { department, playerName: name };
 
     document.getElementById("startScreen").style.display = "none";
     document.getElementById("gameCanvas").style.display = "block";
 
-    // bang_game.js에 정의된 gameLoop 함수 실행
-    window.startGame();
-  };
+    // bang_game.js의 startGame()을 바로 호출합니다.
+    if (typeof window.startGame === 'function') {
+        window.startGame();
+    } else {
+        // 이 오류가 뜨면 bang_game.js 파일 로드 또는 startGame 정의를 확인해야 합니다.
+        console.error("❌ startGame 함수를 찾을 수 없습니다. 게임을 시작할 수 없습니다.");
+        document.getElementById("startScreen").style.display = "flex";
+        document.getElementById("gameCanvas").style.display = "none";
+    }
+};
 
 </script>
 </body>
 </html>
+
 
 
 
