@@ -155,20 +155,7 @@ function drawTextWithBackground(text, x, y, font = "10px NanumGothic", textColor
   ctx.fillText(text, x, y);
 }
 
-//랭킹불러오기
-function loadTopRankings(callback) {
-  db.collection("rankings")
-    .orderBy("score", "desc")
-    .limit(5)
-    .get()
-    .then(snapshot => {
-      const rankings = [];
-      snapshot.forEach(doc => {
-        rankings.push(doc.data());
-      });
-      callback(rankings);
-    });
-}
+
 //랭킹 보기 함수
 function showRankingScreen() {
   ctx.drawImage(images.ranking, 0, 0, WIDTH, HEIGHT); 
@@ -408,6 +395,7 @@ for (let i = patients.length - 1; i >= 0; i--) {
   
   requestAnimationFrame(gameLoop);
 }
+
 
 
 
