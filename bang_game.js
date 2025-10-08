@@ -1,4 +1,4 @@
-function startGame() {
+window.startGame = function startGame() {
   bangImg = images.bang_default;
   requestAnimationFrame(gameLoop);
 }
@@ -412,5 +412,6 @@ for (let i = patients.length - 1; i >= 0; i--) {
   
   requestAnimationFrame(gameLoop);
 }
+
 
 
