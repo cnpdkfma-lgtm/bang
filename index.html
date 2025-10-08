@@ -86,22 +86,21 @@
 </head>
 <body>
     
-    <!-- bang_game.js를 모듈보다 먼저 로드하여 startGame() 정의가 확실하게 완료되도록 합니다. -->
+    <!-- 1. bang_game.js를 모듈보다 먼저 로드 -->
     <script src="bang_game.js"></script>
 
     <div id="startScreen">
         <h2>게임 시작 전 정보를 입력해주세요</h2>
-        <!-- alertMessage div가 startScreen 내부에 있어야 접근이 용이합니다. -->
         <div id="alertMessage"></div> 
-        <input id="departmentInput" placeholder="부서 (예: 감염관리실)" /><br>
-        <input id="nameInput" placeholder="이름 (예: 최아름)" /><br>
-        <!-- handleStart()는 window.handleStart로 정의되었으므로 window. 없이 호출합니다. -->
-        <button onclick="handleStart()">게임 시작</button>
+        <input id="departmentInput" placeholder="부서 (예: 감염관리실)" />
+        <input id="nameInput" placeholder="이름 (예: 최아름)" />
+        <button id="startButton">게임 시작</button>
     </div>
 
     <!-- 캔버스는 시작 화면과 같은 레벨에 있어야 합니다. -->
     <canvas id="gameCanvas" width="850" height="1500" style="display:none;"></canvas>
 
+<!-- 2. Firebase 관련 함수 (Module Script) -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
 // import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-analytics.js";
@@ -134,7 +133,6 @@ window.saveScoreToFirebase = async function(playerName, department, score) {
         console.log("점수 저장 성공!");
     } catch (error) {
         console.error("❌ 저장 실패:", error);
-        // 사용자에게는 콘솔을 통해 오류를 알립니다. (알림 UI 제거)
         console.log(`⚠️ 점수 저장 실패. 오류 코드: ${error.message}`);
     }
 };
@@ -142,7 +140,6 @@ window.saveScoreToFirebase = async function(playerName, department, score) {
 // 랭킹 불러오기 함수
 window.loadTopRankings = async function(callback) {
     // 랭킹은 score 내림차순만 사용하고, timestamp는 색인 생성에만 사용합니다.
-    // ⚠️ 경고: 색인이 아직 적용 중이거나 없는 경우, 이 쿼리가 여전히 $100+$ Reads를 유발합니다.
     const q = query(collection(db, "rankings"), orderBy("score", "desc"), limit(5));
     const querySnapshot = await getDocs(q);
     const rankings = [];
@@ -154,38 +151,51 @@ window.loadTopRankings = async function(callback) {
 
 window.playerInfo = null;
 
-// 게임 시작 핸들러 (window에 명시적으로 할당)
-window.handleStart = function() {
+</script>
+
+<!-- 3. UI 로직 (Global Script - Module 충돌 방지) -->
+<script>
+// 게임 시작 핸들러 (글로벌 스코프에 정의하여 bang_game.js와 충돌 방지)
+function handleStart() {
     const department = document.getElementById("departmentInput").value.trim();
     const name = document.getElementById("nameInput").value.trim();
     const alertMsg = document.getElementById("alertMessage");
 
+    alertMsg.innerText = ""; 
+
     if (!department || !name) {
-        // 🚨 alert() 대신 안전하게 HTML 메시지를 사용합니다.
         alertMsg.innerText = "부서와 이름을 모두 입력해주세요.";
         return;
     }
-    alertMsg.innerText = ""; // 메시지 초기화
 
+    // window.playerInfo는 Module 스크립트에서 정의되었지만, window 객체로 접근 가능
     window.playerInfo = { department, playerName: name };
 
     document.getElementById("startScreen").style.display = "none";
     document.getElementById("gameCanvas").style.display = "block";
 
-    // bang_game.js의 startGame()을 바로 호출합니다.
+    // bang_game.js의 startGame()을 바로 호출합니다. (Global Scope 접근)
     if (typeof window.startGame === 'function') {
         window.startGame();
     } else {
-        // 이 오류가 뜨면 bang_game.js 파일 로드 또는 startGame 정의를 확인해야 합니다.
-        console.error("❌ startGame 함수를 찾을 수 없습니다. 게임을 시작할 수 없습니다.");
+        console.error("❌ startGame 함수를 찾을 수 없습니다. bang_game.js 정의를 확인하세요.");
         document.getElementById("startScreen").style.display = "flex";
         document.getElementById("gameCanvas").style.display = "none";
     }
-};
+}
 
+// DOMContentLoaded 이벤트 리스너: 문서 구조가 로드되면 버튼에 클릭 이벤트를 연결합니다.
+document.addEventListener('DOMContentLoaded', () => {
+    const startButton = document.getElementById('startButton');
+    if (startButton) {
+        startButton.addEventListener('click', handleStart);
+    }
+});
 </script>
+
 </body>
 </html>
+
 
 
 
