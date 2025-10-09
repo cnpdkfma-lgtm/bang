@@ -24,7 +24,12 @@ const db = getFirestore(app);
 // --------------------------
 // 점수 저장
 // --------------------------
+let saveAttempted = false; // 저장 시도 여부 체크
+
 export async function saveScoreToFirebase(playerName, department, score) {
+  if (saveAttempted) return; // 이미 시도했으면 바로 리턴
+  saveAttempted = true;
+  
   try {
     await addDoc(collection(db, "rankings"), {
       name: playerName,
@@ -35,14 +40,13 @@ export async function saveScoreToFirebase(playerName, department, score) {
     console.log("✅ 점수 저장 완료");
 
     // 성공 시 알림
-    showSaveAlert("✅ 점수가 저장되었습니다!", "success");
+    showSaveAlert("✅ 점수 저장 완료!", "success");
 
   } catch (error) {
     console.error("❌ 점수 저장 실패:", error);
 
     // 실패 시 알림
-    showSaveAlert("❌ 점수 저장 실패!\n\n점수가 나온 화면을 캡쳐해서 \n\n감염관리실 최아름에게\n\n보내주세요.",
-      "error");
+    showSaveAlert("❌ 점수 저장 실패!", "error");
   }
 }
 
