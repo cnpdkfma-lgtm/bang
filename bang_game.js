@@ -327,9 +327,9 @@ function gameLoop() {
     ctx.fillText(`${score} 점`, WIDTH / 2 - 56, HEIGHT / 2 - 240);
 
     if (!nameEntered && window.playerInfo) {
+      nameEntered = true;
       const { playerName, department } = window.playerInfo;
       saveScoreToFirebase(playerName, department, score);
-      nameEntered = true;
     }
 
     // 게임 오버 시 Firestore 읽기는 버튼 이벤트에서 처리
