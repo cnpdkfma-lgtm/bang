@@ -26,7 +26,7 @@ const db = getFirestore(app);
 // --------------------------
 export async function saveScoreToFirebase(playerName, department, score) {
   try {
-    await addDoc(collection(db, "rankings"), {
+    await addDoc(collection(db, "rankings_test"), {
       name: playerName,
       department: department,
       score,
