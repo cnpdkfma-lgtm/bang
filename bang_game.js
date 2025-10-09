@@ -22,14 +22,8 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 // --------------------------
-// 점수 저장
-// --------------------------
-let saveAttempted = false; // 저장 시도 여부 체크
 
 export async function saveScoreToFirebase(playerName, department, score) {
-  if (saveAttempted) return; // 이미 시도했으면 바로 리턴
-  saveAttempted = true;
-  
   try {
     await addDoc(collection(db, "rankings"), {
       name: playerName,
