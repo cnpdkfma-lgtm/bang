@@ -11,7 +11,7 @@ import { getFirestore, collection, addDoc, query, orderBy, limit, getDocs } from
 const firebaseConfig = {
   apiKey: "AIzaSyB6Pn4hvYaER8GMduVmKKQEHtLimZoKqss",
   authDomain: "banggame-f2ae8.firebaseapp.com",
-  projectId: "banggame-f2ae8",
+  projectId: "bang=game-f2ae8",
   storageBucket: "banggame-f2ae8.firebasestorage.app",
   messagingSenderId: "494771436388",
   appId: "1:494771436388:web:30af5ee540176b8d501871",
