@@ -33,9 +33,52 @@ export async function saveScoreToFirebase(playerName, department, score) {
       timestamp: new Date()
     });
     console.log("✅ 점수 저장 완료");
+
+    // 성공 시 알림
+    showSaveAlert("✅ 점수가 저장되었습니다!", "success");
+
   } catch (error) {
     console.error("❌ 점수 저장 실패:", error);
+
+    // 실패 시 알림
+    showSaveAlert("❌ 점수 저장 실패!\n\n감염관리실 최아름에게\n\n점수가 나온 화면을 캡쳐해서 보내주세요.",
+      "error");
   }
+}
+
+// 공용 알림창 함수
+function showSaveAlert(message, type = "info") {
+  const alertBox = document.createElement('div');
+  alertBox.innerText = message;
+  alertBox.style.position = 'fixed';
+  alertBox.style.top = '20px';
+  alertBox.style.left = '50%';
+  alertBox.style.transform = 'translateX(-50%)';
+  alertBox.style.padding = '12px 24px';
+  alertBox.style.borderRadius = '12px';
+  alertBox.style.fontSize = '16px';
+  alertBox.style.zIndex = '9999';
+  alertBox.style.transition = 'opacity 0.5s ease';
+  alertBox.style.opacity = '1';
+
+  // 타입에 따라 색상 다르게 표시
+  if (type === "success") {
+    alertBox.style.background = 'rgba(46, 204, 113, 0.9)'; // 초록색
+    alertBox.style.color = 'white';
+  } else if (type === "error") {
+    alertBox.style.background = 'rgba(231, 76, 60, 0.9)'; // 빨간색
+    alertBox.style.color = 'white';
+  } else {
+    alertBox.style.background = 'rgba(52, 152, 219, 0.9)'; // 파랑
+    alertBox.style.color = 'white';
+  }
+
+  document.body.appendChild(alertBox);
+
+  setTimeout(() => {
+    alertBox.style.opacity = '0';
+    setTimeout(() => alertBox.remove(), 500);
+  }, 2000);
 }
 
 // --------------------------
