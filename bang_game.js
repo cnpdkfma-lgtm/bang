@@ -41,7 +41,7 @@ export async function saveScoreToFirebase(playerName, department, score) {
     console.error("❌ 점수 저장 실패:", error);
 
     // 실패 시 알림
-    showSaveAlert("❌ 점수 저장 실패!\n\n감염관리실 최아름에게\n\n점수가 나온 화면을 캡쳐해서 보내주세요.",
+    showSaveAlert("❌ 점수 저장 실패!\n\n점수가 나온 화면을 캡쳐해서 \n\n감염관리실 최아름에게\n\n보내주세요.",
       "error");
   }
 }
