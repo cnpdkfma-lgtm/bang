@@ -3,15 +3,7 @@
 // ==========================
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
-import { 
-  getFirestore, 
-  collection, 
-  addDoc, 
-  query, 
-  orderBy, 
-  limit, 
-  getDocs 
-} from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+import { getFirestore, collection, addDoc, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
 
 // --------------------------
 // Firebase 초기화
@@ -301,17 +293,73 @@ function gameLoop() {
     return;
   }
 
-  // 배경 및 방글이
+    // 배경 및 방글이
   ctx.drawImage(images.background,0,0,WIDTH,HEIGHT);
   ctx.drawImage(bangImg, bang.x, bang.y, bang.width, bang.height);
 
   if (showHeart) {
-    drawTextWithBackground("♥", bang.x+10, bang.y+5,"bold 50px NanumGothic","red","transparent");
-    heartTimer--; if (heartTimer<=0) showHeart=false;
-  }
+  ctx.save();
+  ctx.globalAlpha = 0.85; // 살짝 투명하게
+  ctx.font = "bold 50px NanumGothic";
+  ctx.fillStyle = "red";
+  ctx.fillText("♥", bang.x + 10, bang.y + 5);
+  ctx.restore();
+  heartTimer--;
+  if (heartTimer <= 0) showHeart = false;
+}
 
   drawTextWithBackground(`스테이지: ${stage}`,10,10,"35px NanumGothic","white","black");
   drawTextWithBackground(`점수: ${score}`,10,65,"35px NanumGothic","yellow","black");
+
+  if (stageUpTimer > 0) {
+    let messageLines = ["Level UP!", "환자가 빨리 다가옵니다!"];
+    if (stage === 3 || stage === 5) {
+      messageLines = ["Level UP!", "새로운 감염병 등장!"];
+    } else if (stage === 7) {
+      messageLines = [`스테이지 ${stage} 도달!`, "환자가 두명씩 등장!"];
+    } 
+
+    //게임 배경 그대로
+    ctx.drawImage(images.background, 0, 0, WIDTH, HEIGHT);  
+
+    ctx.font = "bold 40px NanumGothic";
+    ctx.textBaseline = "top";
+
+    const centerY = HEIGHT / 2 - 100;
+    const padding = 10;
+
+    messageLines.forEach((line, i) => {
+      const textWidth = ctx.measureText(line).width;
+      const textHeight = 40; // 폰트 크기 기준
+      const x = WIDTH / 2 - textWidth / 2;
+      const y = centerY + i * 60;
+
+      ctx.fillStyle = "black";
+      ctx.fillRect(x - padding, y - padding, textWidth + padding * 2, textHeight + padding * 2);
+
+      ctx.fillStyle = i === 0 ? "yellow" : "white";
+      ctx.fillText(line, x, y);
+    });
+
+    stageUpTimer--;
+
+    if (stageUpTimer === 0 && !stageUpHandled) {
+      patients = [];
+      const maxPatients = stage < 7 ? 1 : 2;
+      const fixedGap = 500;
+
+      for (let i = 0; i < maxPatients; i++) {
+        const offset = i * fixedGap;
+        patients.push(createPatient(offset));
+      }
+      stageUpHandled = true;
+    }
+
+    requestAnimationFrame(gameLoop);
+    return;
+  }
+
+
 
   // 환자 처리
   const maxPatients = stage<7?1:2;
@@ -339,9 +387,13 @@ function gameLoop() {
   }
 
   // 스테이지 업
-  if (passedPatients>=10 && stage<50) {
-    stage++; passedPatients=0; speed+=stage<7?0.4:0.6; stageUpTimer=50; stageUpHandled=false;
-  }
+  if (passedPatients >= 10 && stage < 50) {
+  stage++;
+  passedPatients = 0;
+  speed += stage < 7 ? 0.4 : 0.6; 
+  stageUpTimer = 50;
+  stageUpHandled = false;
+}
 
   animationId = requestAnimationFrame(gameLoop);
 }
@@ -422,7 +474,3 @@ document.addEventListener("DOMContentLoaded", () => {
     requestAnimationFrame(gameLoop);
   });
 });
-
-
-
-
