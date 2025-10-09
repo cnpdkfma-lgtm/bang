@@ -26,8 +26,7 @@ const db = getFirestore(app);
 // --------------------------
 export async function saveScoreToFirebase(playerName, department, score) {
   try {
-    const fakeDb = null; // 또는 다른 잘못된 값
-    await addDoc(collection(fakeDb, "rankings"), {
+    await addDoc(collection(db, "rankings"), {
       name: playerName,
       department: department,
       score,
